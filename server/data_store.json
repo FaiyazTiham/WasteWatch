@@ -1,0 +1,592 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Sarah Jenkins",
+      "email": "citizen@wastewatch.org",
+      "password_hash": "$2b$10$qyk9C0V6H3jB/PU/kR0uWuD1SJ1xnre9kMtsviTI/7ecguG9etbaW",
+      "role": "user",
+      "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80",
+      "bio": "Eco-conscious citizen passionate about zero-waste neighborhoods and clean public parks.",
+      "phone": "+1 (555) 234-5678",
+      "status": "active",
+      "created_at": "2026-08-02T20:54:16.521Z"
+    },
+    {
+      "id": 2,
+      "name": "Marcus Vance",
+      "email": "admin@wastewatch.org",
+      "password_hash": "$2b$10$Y8ENVd.4.EL5dveNOa0/FuSFr2a3VFdpV3baDg..yPUa1c4ceM7HO",
+      "role": "admin",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+      "bio": "Chief Municipal Sanitation Supervisor & Environmental Operations Director.",
+      "phone": "+1 (555) 876-5432",
+      "status": "active",
+      "created_at": "2026-06-03T20:54:16.522Z"
+    },
+    {
+      "id": 3,
+      "name": "Alex Rivera",
+      "email": "staff@wastewatch.org",
+      "password_hash": "$2b$10$WASEkeMl7f1cHPjT6F1L6.X71r9VQ47MnFzGhjpN4j8Exakt4Uta6",
+      "role": "cleanup_staff",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
+      "bio": "Senior Rapid Response Sanitation Officer - Sector 4 Heavy Duty Cleaning Unit.",
+      "phone": "+1 (555) 432-1098",
+      "status": "active",
+      "created_at": "2026-07-03T20:54:16.522Z"
+    },
+    {
+      "id": 4,
+      "name": "David Chen",
+      "email": "david@example.com",
+      "password_hash": "$2b$10$qyk9C0V6H3jB/PU/kR0uWuD1SJ1xnre9kMtsviTI/7ecguG9etbaW",
+      "role": "user",
+      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80",
+      "bio": "Urban photographer and green trail volunteer.",
+      "phone": "+1 (555) 901-2345",
+      "status": "active",
+      "created_at": "2026-08-12T20:54:16.522Z"
+    },
+    {
+      "id": 5,
+      "name": "Elena Rostova",
+      "email": "elena@example.com",
+      "password_hash": "$2b$10$qyk9C0V6H3jB/PU/kR0uWuD1SJ1xnre9kMtsviTI/7ecguG9etbaW",
+      "role": "cleanup_staff",
+      "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&auto=format&fit=crop&q=80",
+      "bio": "Municipal Waste Operations Specialist - River & Waterways Division.",
+      "phone": "+1 (555) 345-6789",
+      "status": "active",
+      "created_at": "2026-07-18T20:54:16.522Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Household Waste",
+      "slug": "household-waste",
+      "description": "Domestic trash, organic waste, kitchen leftovers & bags",
+      "icon": "Trash2",
+      "color": "#10B981"
+    },
+    {
+      "id": 2,
+      "name": "Plastic & Packaging",
+      "slug": "plastic",
+      "description": "Bottles, single-use bags, packaging materials, styrofoam",
+      "icon": "ShoppingBag",
+      "color": "#3B82F6"
+    },
+    {
+      "id": 3,
+      "name": "Construction Debris",
+      "slug": "construction-waste",
+      "description": "Bricks, concrete rubble, wood tiles, drywall remnants",
+      "icon": "HardHat",
+      "color": "#F59E0B"
+    },
+    {
+      "id": 4,
+      "name": "Industrial Waste",
+      "slug": "industrial-waste",
+      "description": "Chemical drums, metal scraps, rubber tires, toxic containers",
+      "icon": "Factory",
+      "color": "#EF4444"
+    },
+    {
+      "id": 5,
+      "name": "Drain & Sewer Waste",
+      "slug": "drain-sewer",
+      "description": "Clogged storm drains, overflowing sewers, grease runoff",
+      "icon": "Droplets",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": 6,
+      "name": "Roadside Garbage",
+      "slug": "roadside-garbage",
+      "description": "Littered sidewalks, median dumpings, highway roadside piles",
+      "icon": "AlertTriangle",
+      "color": "#EC4899"
+    },
+    {
+      "id": 7,
+      "name": "Water Pollution",
+      "slug": "water-pollution",
+      "description": "Contaminated lakes, floating river trash, coastal canal plastics",
+      "icon": "Waves",
+      "color": "#06B6D4"
+    },
+    {
+      "id": 8,
+      "name": "Other Hazardous Waste",
+      "slug": "other",
+      "description": "Electronic waste, broken glass, batteries, medical materials",
+      "icon": "HelpCircle",
+      "color": "#6B7280"
+    }
+  ],
+  "reports": [
+    {
+      "id": 8,
+      "user_id": 1,
+      "title": "Chemical Paint Residue near Westside Canal",
+      "description": "Several open cans of industrial paint spilled into water drainage basin.",
+      "category_id": 4,
+      "severity": "critical",
+      "status": "cleaned",
+      "latitude": 40.758,
+      "longitude": -73.9855,
+      "address": "450 Westside Highway, Sector 9",
+      "area_district": "Westside Canal District",
+      "primary_photo": "https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?w=800&auto=format&fit=crop&q=80",
+      "cleaned_photo": "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=80",
+      "assigned_to": 3,
+      "verified_at": null,
+      "cleaned_at": "2026-09-01T21:17:51.959Z",
+      "closed_at": null,
+      "views_count": 0,
+      "created_at": "2026-09-01T21:17:51.950Z",
+      "updated_at": "2026-09-01T21:17:51.959Z"
+    },
+    {
+      "id": 1,
+      "user_id": 1,
+      "title": "Massive Plastic Dumping Along Pinecrest Riverbank",
+      "description": "Over 200kg of discarded single-use plastic bottles, styrofoam food containers, and broken milk crates accumulated near the river curve, blocking rainwater discharge.",
+      "category_id": 2,
+      "severity": "critical",
+      "status": "cleaned",
+      "latitude": 40.7128,
+      "longitude": -74.006,
+      "address": "Pinecrest Waterfront Trail, Pier 14, River District",
+      "area_district": "River District",
+      "primary_photo": "https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80",
+      "cleaned_photo": "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=80",
+      "assigned_to": 3,
+      "verified_at": "2026-08-28T20:54:16.522Z",
+      "cleaned_at": "2026-08-31T20:54:16.522Z",
+      "closed_at": null,
+      "views_count": 343,
+      "created_at": "2026-08-27T20:54:16.522Z",
+      "updated_at": "2026-08-31T20:54:16.522Z"
+    },
+    {
+      "id": 2,
+      "user_id": 4,
+      "title": "Clogged Storm Drain with Overflowing Sewage on 5th Ave",
+      "description": "Heavy blockage in municipal drainage grate creating foul water pooling across the pedestrian crosswalk and bicycle lane.",
+      "category_id": 5,
+      "severity": "high",
+      "status": "in_progress",
+      "latitude": 40.7306,
+      "longitude": -73.9352,
+      "address": "Corner of 5th Ave & Elm St, Midtown Hub",
+      "area_district": "Midtown",
+      "primary_photo": "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=800&auto=format&fit=crop&q=80",
+      "cleaned_photo": null,
+      "assigned_to": 3,
+      "verified_at": "2026-08-30T20:54:16.522Z",
+      "cleaned_at": null,
+      "closed_at": null,
+      "views_count": 189,
+      "created_at": "2026-08-29T20:54:16.522Z",
+      "updated_at": "2026-08-31T20:54:16.522Z"
+    },
+    {
+      "id": 3,
+      "user_id": 1,
+      "title": "Illegal Demolition Rubble Dumped near Community School",
+      "description": "Broken concrete slabs, exposed reinforcement rebar, plaster boards, and tile shards dumped beside the Oakridge Elementary playground fence.",
+      "category_id": 3,
+      "severity": "high",
+      "status": "assigned",
+      "latitude": 40.7589,
+      "longitude": -73.9851,
+      "address": "742 Oakridge Ave, North Valley Suburb",
+      "area_district": "North Valley",
+      "primary_photo": "https://images.unsplash.com/photo-1503596476-1c12a8ba09a9?w=800&auto=format&fit=crop&q=80",
+      "cleaned_photo": null,
+      "assigned_to": 5,
+      "verified_at": "2026-08-31T20:54:16.522Z",
+      "cleaned_at": null,
+      "closed_at": null,
+      "views_count": 145,
+      "created_at": "2026-08-30T20:54:16.522Z",
+      "updated_at": "2026-08-31T20:54:16.522Z"
+    },
+    {
+      "id": 4,
+      "user_id": 4,
+      "title": "Overflowing Household Bins and Debris at Market Alley",
+      "description": "Commercial and residential garbage bins overflowing onto the sidewalk, creating pest attraction and blocking storefront access.",
+      "category_id": 1,
+      "severity": "medium",
+      "status": "verified",
+      "latitude": 40.718,
+      "longitude": -73.998,
+      "address": "Market Square Alley #4, Downtown",
+      "area_district": "Downtown",
+      "primary_photo": "https://images.unsplash.com/photo-1528323273322-d81458248d40?w=800&auto=format&fit=crop&q=80",
+      "cleaned_photo": null,
+      "assigned_to": null,
+      "verified_at": "2026-09-01T08:54:16.522Z",
+      "cleaned_at": null,
+      "closed_at": null,
+      "views_count": 98,
+      "created_at": "2026-08-31T20:54:16.522Z",
+      "updated_at": "2026-09-01T08:54:16.522Z"
+    },
+    {
+      "id": 5,
+      "user_id": 1,
+      "title": "Discarded Chemical Drums near Greenway Industrial Canal",
+      "description": "Three unsealed metal drums with rusty corrosion and chemical odor observed near the water runoff edge.",
+      "category_id": 4,
+      "severity": "critical",
+      "status": "reported",
+      "latitude": 40.6782,
+      "longitude": -74.0445,
+      "address": "Greenway Industrial Park, Gate 9, East Harbor",
+      "area_district": "East Harbor",
+      "primary_photo": "https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?w=800&auto=format&fit=crop&q=80",
+      "cleaned_photo": null,
+      "assigned_to": null,
+      "verified_at": null,
+      "cleaned_at": null,
+      "closed_at": null,
+      "views_count": 76,
+      "created_at": "2026-09-01T14:54:16.522Z",
+      "updated_at": "2026-09-01T14:54:16.522Z"
+    },
+    {
+      "id": 6,
+      "user_id": 4,
+      "title": "Major Highway Median Trash Accumulation on Highway 101",
+      "description": "Blown tires, fast food containers, plastic tarps, and packaging cluttering the center divider along mile marker 14.",
+      "category_id": 6,
+      "severity": "medium",
+      "status": "cleaned",
+      "latitude": 40.7831,
+      "longitude": -73.9712,
+      "address": "State Route 101, Milepost 14 Westbound",
+      "area_district": "West Highway Corridor",
+      "primary_photo": "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=800&auto=format&fit=crop&q=80",
+      "cleaned_photo": "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=800&auto=format&fit=crop&q=80",
+      "assigned_to": 3,
+      "verified_at": "2026-08-26T20:54:16.522Z",
+      "cleaned_at": "2026-08-30T20:54:16.522Z",
+      "closed_at": "2026-08-31T20:54:16.522Z",
+      "views_count": 220,
+      "created_at": "2026-08-25T20:54:16.522Z",
+      "updated_at": "2026-08-31T20:54:16.522Z"
+    },
+    {
+      "id": 7,
+      "user_id": 1,
+      "title": "Oil Slick and Plastic Bottles in Lakeview Public Pond",
+      "description": "Surface petroleum sheen and dozens of floating plastic soda bottles trapping waterfowl near the observation deck.",
+      "category_id": 7,
+      "severity": "high",
+      "status": "in_progress",
+      "latitude": 40.7484,
+      "longitude": -73.9857,
+      "address": "Lakeview Memorial Park, South Pond Deck",
+      "area_district": "Central Parkview",
+      "primary_photo": "https://images.unsplash.com/photo-1621451537084-482c73073a0f?w=800&auto=format&fit=crop&q=80",
+      "cleaned_photo": null,
+      "assigned_to": 5,
+      "verified_at": "2026-08-30T20:54:16.522Z",
+      "cleaned_at": null,
+      "closed_at": null,
+      "views_count": 310,
+      "created_at": "2026-08-29T20:54:16.522Z",
+      "updated_at": "2026-09-01T08:54:16.522Z"
+    }
+  ],
+  "report_photos": [],
+  "report_status_logs": [
+    {
+      "id": 1,
+      "report_id": 1,
+      "changed_by_user_id": 1,
+      "from_status": null,
+      "to_status": "reported",
+      "notes": "Initial report submitted by citizen.",
+      "photo_url": null,
+      "created_at": "2026-08-27T20:54:16.522Z"
+    },
+    {
+      "id": 2,
+      "report_id": 1,
+      "changed_by_user_id": 2,
+      "from_status": "reported",
+      "to_status": "verified",
+      "notes": "Inspection confirmed hazardous plastic accumulation.",
+      "photo_url": null,
+      "created_at": "2026-08-28T20:54:16.522Z"
+    },
+    {
+      "id": 3,
+      "report_id": 1,
+      "changed_by_user_id": 2,
+      "from_status": "verified",
+      "to_status": "assigned",
+      "notes": "Assigned to Alex Rivera Rapid Response Team.",
+      "photo_url": null,
+      "created_at": "2026-08-29T20:54:16.522Z"
+    },
+    {
+      "id": 4,
+      "report_id": 1,
+      "changed_by_user_id": 3,
+      "from_status": "assigned",
+      "to_status": "in_progress",
+      "notes": "Sanitation crew and waste containment boat on site.",
+      "photo_url": null,
+      "created_at": "2026-08-30T20:54:16.522Z"
+    },
+    {
+      "id": 5,
+      "report_id": 1,
+      "changed_by_user_id": 3,
+      "from_status": "in_progress",
+      "to_status": "cleaned",
+      "notes": "All waste removed, recycled and riverfront restored.",
+      "photo_url": "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=80",
+      "created_at": "2026-08-31T20:54:16.522Z"
+    },
+    {
+      "id": 6,
+      "report_id": 2,
+      "changed_by_user_id": 4,
+      "from_status": null,
+      "to_status": "reported",
+      "notes": "Initial citizen complaint filed.",
+      "photo_url": null,
+      "created_at": "2026-08-29T20:54:16.522Z"
+    },
+    {
+      "id": 7,
+      "report_id": 2,
+      "changed_by_user_id": 2,
+      "from_status": "reported",
+      "to_status": "verified",
+      "notes": "Sanitation officer confirmed drain blockage.",
+      "photo_url": null,
+      "created_at": "2026-08-30T20:54:16.522Z"
+    },
+    {
+      "id": 8,
+      "report_id": 2,
+      "changed_by_user_id": 3,
+      "from_status": "verified",
+      "to_status": "in_progress",
+      "notes": "Hydro-jetting unit actively clearing storm line.",
+      "photo_url": null,
+      "created_at": "2026-08-31T20:54:16.522Z"
+    },
+    {
+      "id": 9,
+      "report_id": 8,
+      "changed_by_user_id": 1,
+      "from_status": null,
+      "to_status": "reported",
+      "notes": "Citizen complaint submitted.",
+      "photo_url": null,
+      "created_at": "2026-09-01T21:17:51.950Z"
+    },
+    {
+      "id": 10,
+      "report_id": 8,
+      "changed_by_user_id": 3,
+      "from_status": "reported",
+      "to_status": "cleaned",
+      "notes": "Sanitation unit vacuumed residue, neutralizer applied.",
+      "photo_url": "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=80",
+      "created_at": "2026-09-01T21:17:51.959Z"
+    }
+  ],
+  "upvotes": [
+    {
+      "id": 2,
+      "report_id": 1,
+      "user_id": 2,
+      "created_at": "2026-09-01T20:54:16.522Z"
+    },
+    {
+      "id": 3,
+      "report_id": 1,
+      "user_id": 4,
+      "created_at": "2026-09-01T20:54:16.522Z"
+    },
+    {
+      "id": 4,
+      "report_id": 2,
+      "user_id": 1,
+      "created_at": "2026-09-01T20:54:16.522Z"
+    },
+    {
+      "id": 5,
+      "report_id": 2,
+      "user_id": 4,
+      "created_at": "2026-09-01T20:54:16.522Z"
+    },
+    {
+      "id": 6,
+      "report_id": 3,
+      "user_id": 4,
+      "created_at": "2026-09-01T20:54:16.522Z"
+    },
+    {
+      "id": 7,
+      "report_id": 5,
+      "user_id": 1,
+      "created_at": "2026-09-01T20:54:16.522Z"
+    },
+    {
+      "id": 8,
+      "report_id": 7,
+      "user_id": 1,
+      "created_at": "2026-09-01T20:54:16.522Z"
+    },
+    {
+      "id": 9,
+      "report_id": 7,
+      "user_id": 4,
+      "created_at": "2026-09-01T20:54:16.522Z"
+    }
+  ],
+  "comments": [
+    {
+      "id": 1,
+      "report_id": 1,
+      "user_id": 4,
+      "content": "Thank you for reporting this! Our local walking club was very concerned about the wildlife here.",
+      "created_at": "2026-08-28T20:54:16.522Z"
+    },
+    {
+      "id": 2,
+      "report_id": 1,
+      "user_id": 3,
+      "content": "Team Rivera deployed heavy trash vacuum and bagged 18 sacks of plastic. All clear!",
+      "created_at": "2026-08-31T20:54:16.522Z"
+    },
+    {
+      "id": 3,
+      "report_id": 2,
+      "user_id": 1,
+      "content": "The water was reaching knee height during yesterday rain. Thanks for prioritizing!",
+      "created_at": "2026-08-30T20:54:16.522Z"
+    },
+    {
+      "id": 4,
+      "report_id": 3,
+      "user_id": 2,
+      "content": "Demolition permit verified. Contractor has been issued a municipal citation and scheduled for cleanup.",
+      "created_at": "2026-08-31T20:54:16.522Z"
+    },
+    {
+      "id": 5,
+      "report_id": 7,
+      "user_id": 5,
+      "content": "Skimmer boats are currently deployed to remove surface slick and floating debris.",
+      "created_at": "2026-09-01T08:54:16.522Z"
+    },
+    {
+      "id": 6,
+      "report_id": 1,
+      "user_id": 1,
+      "user_name": "Sarah Jenkins",
+      "user_avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80",
+      "user_role": "user",
+      "content": "Integration test automated comment: verified area!",
+      "created_at": "2026-09-01T21:17:51.931Z"
+    }
+  ],
+  "flags": [
+    {
+      "id": 1,
+      "report_id": 2,
+      "user_id": 1,
+      "reason": "Duplicate submission",
+      "details": "Integration test test flag",
+      "status": "pending",
+      "created_at": "2026-09-01T21:17:51.941Z"
+    }
+  ],
+  "notifications": [
+    {
+      "id": 6,
+      "user_id": 1,
+      "title": "Status Update: CLEANED",
+      "message": "Your report \"Chemical Paint Residue near Westsid...\" moved to status: cleaned. Note: Sanitation unit vacuumed residue, neutralizer applied.",
+      "type": "status_change",
+      "link_url": "/reports/8",
+      "is_read": false,
+      "created_at": "2026-09-01T21:17:51.960Z"
+    },
+    {
+      "id": 5,
+      "user_id": 1,
+      "title": "Report Submitted! 📋",
+      "message": "Your complaint \"Chemical Paint Residue near Westside Can...\" has been logged for municipal review.",
+      "type": "status_change",
+      "link_url": "/reports/8",
+      "is_read": false,
+      "created_at": "2026-09-01T21:17:51.951Z"
+    },
+    {
+      "id": 1,
+      "user_id": 1,
+      "title": "Report Cleaned! 🎉",
+      "message": "Your report \"Massive Plastic Dumping Along Pinecrest Riverbank\" has been cleaned and verified.",
+      "type": "status_change",
+      "link_url": "/reports/1",
+      "is_read": false,
+      "created_at": "2026-08-31T20:54:16.522Z"
+    },
+    {
+      "id": 2,
+      "user_id": 1,
+      "title": "Report Verified",
+      "message": "Municipal supervisor has verified your report on Pinecrest Riverbank.",
+      "type": "verification",
+      "link_url": "/reports/1",
+      "is_read": true,
+      "created_at": "2026-08-28T20:54:16.522Z"
+    },
+    {
+      "id": 3,
+      "user_id": 4,
+      "title": "Cleanup In Progress 🚜",
+      "message": "Sanitation team is currently clearing the drain blockage on 5th Ave.",
+      "type": "status_change",
+      "link_url": "/reports/2",
+      "is_read": false,
+      "created_at": "2026-08-31T20:54:16.522Z"
+    },
+    {
+      "id": 4,
+      "user_id": 1,
+      "title": "New Upvote Received",
+      "message": "A citizen upvoted your waste report on Pinecrest Riverbank.",
+      "type": "upvote",
+      "link_url": "/reports/1",
+      "is_read": true,
+      "created_at": "2026-08-30T20:54:16.522Z"
+    }
+  ],
+  "contact_messages": [
+    {
+      "id": 1,
+      "name": "Alex Johnson",
+      "email": "alex@example.com",
+      "subject": "Community Cleanup Drive Collaboration",
+      "message": "We want to organize a weekend trash pickup drive in Sector 5.",
+      "status": "new",
+      "created_at": "2026-09-01T21:17:51.985Z"
+    }
+  ]
+}
