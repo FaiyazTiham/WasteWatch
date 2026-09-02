@@ -404,16 +404,16 @@ exports.createReport = async (req, res) => {
       if (req.files && req.files.length > 1) {
         for (let i = 1; i < req.files.length; i++) {
           await db.getPool().query(
-            'INSERT INTO report_photos (report_id, photo_url, photo_type) VALUES (?, ?, "before")',
-            [reportId, `/uploads/${req.files[i].filename}`]
+            'INSERT INTO report_photos (report_id, photo_url, photo_type) VALUES (?, ?, ?)',
+            [reportId, `/uploads/${req.files[i].filename}`, 'before']
           );
         }
       }
 
       // Initial status log
       await db.getPool().query(
-        'INSERT INTO report_status_logs (report_id, changed_by_user_id, from_status, to_status, notes) VALUES (?, ?, NULL, "reported", "Citizen complaint submitted.")',
-        [reportId, userId]
+        'INSERT INTO report_status_logs (report_id, changed_by_user_id, from_status, to_status, notes) VALUES (?, ?, NULL, ?, ?)',
+        [reportId, userId, 'reported', 'Citizen complaint submitted.']
       );
 
       // Notification
