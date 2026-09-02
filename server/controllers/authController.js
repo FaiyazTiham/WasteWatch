@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 const { JWT_SECRET } = require('../middleware/auth');
+const { getUploadedFileUrl } = require('../utils/imageStorage');
 
 function generateToken(user) {
   return jwt.sign(
@@ -277,7 +278,7 @@ exports.updateProfile = async (req, res) => {
 
     let updatedAvatar = avatar || req.user.avatar;
     if (req.file) {
-      updatedAvatar = `/uploads/${req.file.filename}`;
+      updatedAvatar = await getUploadedFileUrl(req.file, 'wastewatch/avatars');
     }
 
     const updatedName = (name && name.trim()) || req.user.name;

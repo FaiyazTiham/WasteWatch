@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { getUploadedFileUrl } = require('../utils/imageStorage');
 
 // Helper to create notifications
 async function createNotification({ userId, title, message, type = 'system', linkUrl = null }) {
@@ -384,9 +385,9 @@ exports.createReport = async (req, res) => {
 
     let primaryPhoto = photo_url || req.body.primary_photo || 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80';
     if (req.files && req.files.length > 0) {
-      primaryPhoto = `/uploads/${req.files[0].filename}`;
+      primaryPhoto = await getUploadedFileUrl(req.files[0], 'wastewatch/reports');
     } else if (req.file) {
-      primaryPhoto = `/uploads/${req.file.filename}`;
+      primaryPhoto = await getUploadedFileUrl(req.file, 'wastewatch/reports');
     }
 
     const district = area_district || 'Downtown Metro';
@@ -405,7 +406,7 @@ exports.createReport = async (req, res) => {
         for (let i = 1; i < req.files.length; i++) {
           await db.getPool().query(
             'INSERT INTO report_photos (report_id, photo_url, photo_type) VALUES (?, ?, ?)',
-            [reportId, `/uploads/${req.files[i].filename}`, 'before']
+            [reportId, await getUploadedFileUrl(req.files[i], 'wastewatch/reports'), 'before']
           );
         }
       }
@@ -467,7 +468,7 @@ exports.createReport = async (req, res) => {
         db.fallbackStore.data.report_photos.push({
           id: db.fallbackStore.getNextId('report_photos'),
           report_id: reportId,
-          photo_url: `/uploads/${req.files[i].filename}`,
+          photo_url: await getUploadedFileUrl(req.files[i], 'wastewatch/reports'),
           photo_type: 'before',
           created_at: new Date().toISOString()
         });
@@ -516,7 +517,7 @@ exports.updateReportStatus = async (req, res) => {
 
     let afterPhoto = cleaned_photo || null;
     if (req.file) {
-      afterPhoto = `/uploads/${req.file.filename}`;
+      afterPhoto = await getUploadedFileUrl(req.file, 'wastewatch/reports');
     }
 
     let report = null;
