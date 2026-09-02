@@ -7,7 +7,11 @@
       "destination": "/api/index.js"
     },
     {
-      "source": "/((?!api/|uploads/|.*\\..*).*)",
+      "source": "/(.*)",
+      "destination": "/$1"
+    },
+    {
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
