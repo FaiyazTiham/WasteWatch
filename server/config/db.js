@@ -2,7 +2,10 @@ const mysql = require('mysql2/promise');
 const path = require('path');
 const fs = require('fs');
 const net = require('net');
-require('dotenv').config();
+const envPath = fs.existsSync(path.resolve(__dirname, '../../.env'))
+  ? path.resolve(__dirname, '../../.env')
+  : path.resolve(__dirname, '../.env');
+require('dotenv').config({ path: envPath });
 
 let dbPool = null;
 let isMysqlActive = false;
@@ -136,7 +139,7 @@ async function createMysqlTables() {
       avatar VARCHAR(500) DEFAULT NULL,
       bio TEXT DEFAULT NULL,
       phone VARCHAR(30) DEFAULT NULL,
-      status ENUM('active', 'banned') NOT NULL DEFAULT 'active',
+      status ENUM('active', 'pending_approval', 'banned') NOT NULL DEFAULT 'active',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )`,
@@ -235,6 +238,12 @@ async function createMysqlTables() {
 
   for (const sql of tables) {
     await dbPool.query(sql);
+  }
+
+  try {
+    await dbPool.query("ALTER TABLE users MODIFY COLUMN status ENUM('active', 'pending_approval', 'banned') NOT NULL DEFAULT 'active'");
+  } catch (err) {
+    // Already modified
   }
 }
 

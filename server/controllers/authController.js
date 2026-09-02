@@ -11,6 +11,39 @@ function generateToken(user) {
   );
 }
 
+// Helper to notify all active administrators
+async function notifyAdmins({ title, message, type = 'approval_request', linkUrl = '/admin/users' }) {
+  try {
+    if (db.isMysqlActive) {
+      const [admins] = await db.getPool().query('SELECT id FROM users WHERE role = "admin" AND status = "active"');
+      for (const admin of admins) {
+        await db.getPool().query(
+          'INSERT INTO notifications (user_id, title, message, type, link_url, is_read) VALUES (?, ?, ?, ?, ?, FALSE)',
+          [admin.id, title, message, type, linkUrl]
+        );
+      }
+    } else {
+      const admins = db.fallbackStore.data.users.filter(u => u.role === 'admin' && u.status === 'active');
+      for (const admin of admins) {
+        const newId = db.fallbackStore.getNextId('notifications');
+        db.fallbackStore.data.notifications.unshift({
+          id: newId,
+          user_id: Number(admin.id),
+          title,
+          message,
+          type,
+          link_url: linkUrl,
+          is_read: false,
+          created_at: new Date().toISOString()
+        });
+      }
+      db.fallbackStore.save();
+    }
+  } catch (err) {
+    console.warn('Failed to notify admins:', err.message);
+  }
+}
+
 // 1. Register User
 exports.register = async (req, res) => {
   try {
@@ -22,6 +55,8 @@ exports.register = async (req, res) => {
 
     const cleanEmail = email.trim().toLowerCase();
     const assignedRole = (role === 'admin' || role === 'cleanup_staff') ? role : 'user';
+    const isStaffOrAdmin = assignedRole === 'admin' || assignedRole === 'cleanup_staff';
+    const initialStatus = isStaffOrAdmin ? 'pending_approval' : 'active';
 
     // Check existing email
     if (db.isMysqlActive) {
@@ -35,7 +70,7 @@ exports.register = async (req, res) => {
 
       const [result] = await db.getPool().query(
         'INSERT INTO users (name, email, password_hash, role, avatar, bio, phone, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [name.trim(), cleanEmail, passwordHash, assignedRole, defaultAvatar, bio || null, phone || null, 'active']
+        [name.trim(), cleanEmail, passwordHash, assignedRole, defaultAvatar, bio || null, phone || null, initialStatus]
       );
 
       const newUser = {
@@ -46,9 +81,25 @@ exports.register = async (req, res) => {
         avatar: defaultAvatar,
         bio: bio || null,
         phone: phone || null,
-        status: 'active',
+        status: initialStatus,
         created_at: new Date().toISOString()
       };
+
+      if (isStaffOrAdmin) {
+        await notifyAdmins({
+          title: 'New Access Approval Request 🛡️',
+          message: `${newUser.name} (${newUser.email}) has registered as ${assignedRole === 'admin' ? 'Administrator' : 'Cleanup Staff'} and is waiting for your approval.`,
+          type: 'approval_request',
+          linkUrl: '/admin/users'
+        });
+
+        return res.status(201).json({
+          success: true,
+          pending_approval: true,
+          message: 'Account created! Since you registered for Staff/Admin privileges, current administrators must approve your account before you can log in.',
+          user: newUser
+        });
+      }
 
       const token = generateToken(newUser);
       return res.status(201).json({ success: true, message: 'Account created successfully!', token, user: newUser });
@@ -73,7 +124,7 @@ exports.register = async (req, res) => {
       avatar: defaultAvatar,
       bio: bio || null,
       phone: phone || null,
-      status: 'active',
+      status: initialStatus,
       created_at: new Date().toISOString()
     };
 
@@ -81,6 +132,23 @@ exports.register = async (req, res) => {
     db.fallbackStore.save();
 
     const { password_hash, ...safeUser } = newUser;
+
+    if (isStaffOrAdmin) {
+      await notifyAdmins({
+        title: 'New Access Approval Request 🛡️',
+        message: `${safeUser.name} (${safeUser.email}) has registered as ${assignedRole === 'admin' ? 'Administrator' : 'Cleanup Staff'} and is waiting for your approval.`,
+        type: 'approval_request',
+        linkUrl: '/admin/users'
+      });
+
+      return res.status(201).json({
+        success: true,
+        pending_approval: true,
+        message: 'Account created! Since you registered for Staff/Admin privileges, current administrators must approve your account before you can log in.',
+        user: safeUser
+      });
+    }
+
     const token = generateToken(safeUser);
     return res.status(201).json({ success: true, message: 'Account created successfully!', token, user: safeUser });
   } catch (err) {
@@ -115,6 +183,21 @@ exports.login = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Your account has been deactivated by administrators.' });
     }
 
+    if (user.status === 'pending_approval') {
+      await notifyAdmins({
+        title: 'Pending Staff/Admin Login Attempt ⚠️',
+        message: `${user.name} (${user.email}) attempted to log in as ${user.role} while pending approval.`,
+        type: 'approval_request',
+        linkUrl: '/admin/users'
+      });
+
+      return res.status(403).json({
+        success: false,
+        pending_approval: true,
+        message: 'Your account is pending supervisor approval. Current administrators have been notified to review your account access.'
+      });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password_hash);
     if (!isMatch) {
       return res.status(401).json({ success: false, message: 'Invalid email or password credentials.' });
@@ -130,33 +213,9 @@ exports.login = async (req, res) => {
   }
 };
 
-// 3. Demo Quick Login
+// 3. Demo Quick Login (Disabled)
 exports.demoLogin = async (req, res) => {
-  try {
-    const { role } = req.params; // citizen, admin, staff
-    let targetEmail = 'citizen@wastewatch.org';
-    if (role === 'admin') targetEmail = 'admin@wastewatch.org';
-    if (role === 'staff' || role === 'cleanup_staff') targetEmail = 'staff@wastewatch.org';
-
-    let user = null;
-    if (db.isMysqlActive) {
-      const [rows] = await db.getPool().query('SELECT * FROM users WHERE email = ?', [targetEmail]);
-      user = rows[0];
-    } else {
-      user = db.fallbackStore.data.users.find(u => u.email === targetEmail);
-    }
-
-    if (!user) {
-      return res.status(404).json({ success: false, message: `Demo user for role ${role} not found.` });
-    }
-
-    const { password_hash, ...safeUser } = user;
-    const token = generateToken(safeUser);
-
-    return res.json({ success: true, message: `Logged in as demo ${safeUser.role}!`, token, user: safeUser });
-  } catch (err) {
-    return res.status(500).json({ success: false, message: 'Demo login error', error: err.message });
-  }
+  return res.status(403).json({ success: false, message: 'Demo login has been disabled.' });
 };
 
 // 4. Get Current Authenticated User (Profile + Stats)

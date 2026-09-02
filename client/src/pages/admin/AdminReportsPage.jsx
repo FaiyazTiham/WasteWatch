@@ -5,12 +5,15 @@ import {
   ShieldCheck, AlertTriangle, CheckCircle2, UserCheck, RefreshCw, Sparkles
 } from 'lucide-react';
 import { reportService, adminService } from '../../api/apiServices';
+import { getImageUrl } from '../../api/client';
+import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import StatusBadge from '../../components/common/StatusBadge';
 import SeverityBadge from '../../components/common/SeverityBadge';
 import StatusUpdateModal from '../../components/admin/StatusUpdateModal';
 
 export default function AdminReportsPage() {
+  const { user, isAdmin } = useAuth();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -136,70 +139,85 @@ export default function AdminReportsPage() {
                   <td colSpan={5} className="p-8 text-center text-slate-400">No complaints matching filter.</td>
                 </tr>
               ) : (
-                reports.map((r) => (
-                  <tr key={r.id} className="hover:bg-slate-800/30 transition-colors">
-                    <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={r.primary_photo}
-                          alt={r.title}
-                          className="w-12 h-12 rounded-xl object-cover bg-slate-900 shrink-0 border border-slate-700"
-                          onError={(e) => {
-                            e.target.src = 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80';
-                          }}
-                        />
-                        <div className="min-w-0">
-                          <Link to={`/reports/${r.id}`} className="font-bold text-white hover:text-emerald-400 transition-colors truncate block max-w-xs">
-                            {r.title}
-                          </Link>
-                          <span className="text-[11px] text-slate-500">
-                            By {r.reporter_name || 'Citizen'} • {new Date(r.created_at).toLocaleDateString()}
-                          </span>
+                reports.map((r) => {
+                  const canUpdate = isAdmin || (user?.role === 'cleanup_staff' && Number(r.assigned_to) === Number(user?.id));
+
+                  return (
+                    <tr key={r.id} className="hover:bg-slate-800/30 transition-colors">
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={getImageUrl(r.primary_photo)}
+                            alt={r.title}
+                            className="w-12 h-12 rounded-xl object-cover bg-slate-900 shrink-0 border border-slate-700"
+                            onError={(e) => {
+                              e.target.src = 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80';
+                            }}
+                          />
+                          <div className="min-w-0">
+                            <Link to={`/reports/${r.id}`} className="font-bold text-white hover:text-emerald-400 transition-colors truncate block max-w-xs">
+                              {r.title}
+                            </Link>
+                            <span className="text-[11px] text-slate-500">
+                              By {r.reporter_name || 'Citizen'} • {new Date(r.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    <td className="p-4 space-y-1">
-                      <div className="font-medium text-slate-200">{r.category_name}</div>
-                      <SeverityBadge severity={r.severity} size="sm" />
-                    </td>
+                      <td className="p-4 space-y-1">
+                        <div className="font-medium text-slate-200">{r.category_name}</div>
+                        <SeverityBadge severity={r.severity} size="sm" />
+                      </td>
 
-                    <td className="p-4">
-                      <div className="font-medium text-slate-200 truncate max-w-xs">{r.address}</div>
-                      <div className="text-[11px] text-emerald-400 font-semibold">{r.area_district}</div>
-                    </td>
+                      <td className="p-4">
+                        <div className="font-medium text-slate-200 truncate max-w-xs">{r.address}</div>
+                        <div className="text-[11px] text-emerald-400 font-semibold">{r.area_district}</div>
+                      </td>
 
-                    <td className="p-4">
-                      <StatusBadge status={r.status} size="sm" />
-                    </td>
+                      <td className="p-4">
+                        <StatusBadge status={r.status} size="sm" />
+                      </td>
 
-                    <td className="p-4 text-right space-x-2">
-                      <button
-                        onClick={() => setSelectedReportForUpdate(r)}
-                        className="p-1.5 rounded-lg bg-purple-950/80 hover:bg-purple-900 border border-purple-500/30 text-purple-300 transition-colors"
-                        title="Change Status & Assign"
-                      >
-                        <Wrench className="w-4 h-4" />
-                      </button>
+                      <td className="p-4 text-right space-x-2">
+                        {canUpdate ? (
+                          <button
+                            onClick={() => setSelectedReportForUpdate(r)}
+                            className="p-1.5 rounded-lg bg-purple-950/80 hover:bg-purple-900 border border-purple-500/30 text-purple-300 transition-colors"
+                            title="Change Status & Assign"
+                          >
+                            <Wrench className="w-4 h-4" />
+                          </button>
+                        ) : user?.role === 'cleanup_staff' ? (
+                          <span
+                            className="inline-block p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-600 cursor-not-allowed"
+                            title="Only assigned staff member can update status"
+                          >
+                            <Wrench className="w-4 h-4 opacity-40" />
+                          </span>
+                        ) : null}
 
-                      <Link
-                        to={`/reports/${r.id}`}
-                        className="inline-block p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
-                        title="View Details"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Link>
+                        <Link
+                          to={`/reports/${r.id}`}
+                          className="inline-block p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+                          title="View Details"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Link>
 
-                      <button
-                        onClick={() => handleDelete(r.id)}
-                        className="p-1.5 rounded-lg bg-rose-950/60 hover:bg-rose-900 border border-rose-500/30 text-rose-400 transition-colors"
-                        title="Delete Report"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                        {isAdmin && (
+                          <button
+                            onClick={() => handleDelete(r.id)}
+                            className="p-1.5 rounded-lg bg-rose-950/60 hover:bg-rose-900 border border-rose-500/30 text-rose-400 transition-colors"
+                            title="Delete Report"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

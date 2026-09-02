@@ -10,24 +10,35 @@ import { useToast } from '../context/ToastContext';
 import LocationPickerMap from '../components/map/LocationPickerMap';
 import SeverityBadge from '../components/common/SeverityBadge';
 
+const DEFAULT_CATEGORIES = [
+  { id: 1, name: 'Household Waste', slug: 'household-waste', description: 'Domestic trash, organic waste', icon: 'Trash2', color: '#10B981' },
+  { id: 2, name: 'Plastic & Packaging', slug: 'plastic', description: 'Bottles, bags, packaging', icon: 'ShoppingBag', color: '#3B82F6' },
+  { id: 3, name: 'Construction Debris', slug: 'construction-waste', description: 'Bricks, concrete, wood', icon: 'HardHat', color: '#F59E0B' },
+  { id: 4, name: 'Industrial Waste', slug: 'industrial-waste', description: 'Chemical drums, metal scraps', icon: 'Factory', color: '#EF4444' },
+  { id: 5, name: 'Drain & Sewer Waste', slug: 'drain-sewer', description: 'Clogged storm drains, sewers', icon: 'Droplets', color: '#8B5CF6' },
+  { id: 6, name: 'Roadside Garbage', slug: 'roadside-garbage', description: 'Littered sidewalks, median piles', icon: 'AlertTriangle', color: '#EC4899' },
+  { id: 7, name: 'Water Pollution', slug: 'water-pollution', description: 'Contaminated lakes, river trash', icon: 'Waves', color: '#06B6D4' },
+  { id: 8, name: 'Other Hazardous Waste', slug: 'other', description: 'E-waste, glass, batteries', icon: 'HelpCircle', color: '#6B7280' }
+];
+
 export default function ReportWastePage() {
   const { isAuthenticated, user, demoLogin } = useAuth();
   const { success, error } = useToast();
   const navigate = useNavigate();
 
-  const [categories, setCategories] = useState([]);
-  const [loadingCats, setLoadingCats] = useState(true);
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
+  const [loadingCats, setLoadingCats] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   // Form State
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [categoryId, setCategoryId] = useState('');
+  const [categoryId, setCategoryId] = useState('1');
   const [severity, setSeverity] = useState('medium');
-  const [latitude, setLatitude] = useState(40.7128);
-  const [longitude, setLongitude] = useState(-74.0060);
-  const [address, setAddress] = useState('Pinecrest Waterfront, River District');
-  const [areaDistrict, setAreaDistrict] = useState('River District');
+  const [latitude, setLatitude] = useState(23.8103);
+  const [longitude, setLongitude] = useState(90.4125);
+  const [address, setAddress] = useState('Dhanmondi, Dhaka, Bangladesh');
+  const [areaDistrict, setAreaDistrict] = useState('Dhaka');
   const [dateTime, setDateTime] = useState(() => new Date().toISOString().slice(0, 16));
 
   // Photo uploads
@@ -40,15 +51,14 @@ export default function ReportWastePage() {
   useEffect(() => {
     reportService.getCategories()
       .then((res) => {
-        if (res.data.success) {
-          setCategories(res.data.categories || []);
-          if (res.data.categories?.length > 0) {
+        if (res.data.success && res.data.categories?.length > 0) {
+          setCategories(res.data.categories);
+          if (!categoryId) {
             setCategoryId(String(res.data.categories[0].id));
           }
         }
       })
-      .catch(() => {})
-      .finally(() => setLoadingCats(false));
+      .catch(() => {});
   }, []);
 
   const handlePrimaryFileSelect = (e) => {
@@ -104,8 +114,19 @@ export default function ReportWastePage() {
       } else if (photoUrl) {
         formData.append('photo_url', photoUrl.trim());
       } else {
-        // Default sample if neither provided
-        formData.append('photo_url', 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80');
+        // Unique category-matched photo fallback
+        const categoryPhotos = {
+          '1': 'https://images.unsplash.com/photo-1528323273322-d81458248d40?w=800&auto=format&fit=crop&q=80',
+          '2': 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80',
+          '3': 'https://images.unsplash.com/photo-1503596476-1c12a8ba09a9?w=800&auto=format&fit=crop&q=80',
+          '4': 'https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?w=800&auto=format&fit=crop&q=80',
+          '5': 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=800&auto=format&fit=crop&q=80',
+          '6': 'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=800&auto=format&fit=crop&q=80',
+          '7': 'https://images.unsplash.com/photo-1621451537084-482c73073a0f?w=800&auto=format&fit=crop&q=80',
+          '8': 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=800&auto=format&fit=crop&q=80'
+        };
+        const defaultPhoto = categoryPhotos[String(categoryId)] || categoryPhotos['1'];
+        formData.append('photo_url', defaultPhoto);
       }
 
       extraFiles.forEach((file) => {
@@ -375,6 +396,7 @@ export default function ReportWastePage() {
             }}
             address={address}
             onAddressChange={(addr) => setAddress(addr)}
+            onAreaDistrictChange={(dist) => setAreaDistrict(dist)}
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -2,19 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import {
   Layers, Flame, Sparkles, AlertOctagon, Search,
-  Filter, PlusCircle, RefreshCw, ThumbsUp
+  Filter, PlusCircle, RefreshCw, ThumbsUp, Wrench
 } from 'lucide-react';
 import { reportService } from '../api/apiServices';
+import { useAuth } from '../context/AuthContext';
 import ReportCard from '../components/common/ReportCard';
 
 export default function ReportsFeedPage() {
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [reports, setReports] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Tab & Filters
-  const [activeTab, setActiveTab] = useState('all'); // 'all', 'popular', 'cleaned', 'critical'
+  const [activeTab, setActiveTab] = useState('all'); // 'all', 'popular', 'cleaned', 'critical', 'assigned_to_me'
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -23,7 +25,7 @@ export default function ReportsFeedPage() {
       .then((res) => {
         if (res.data.success) setCategories(res.data.categories || []);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const fetchReports = async () => {
@@ -39,6 +41,8 @@ export default function ReportsFeedPage() {
         params.status = 'cleaned';
       } else if (activeTab === 'critical') {
         params.severity = 'critical';
+      } else if (activeTab === 'assigned_to_me' && user?.id) {
+        params.assigned_to = user.id;
       } else {
         params.sort = 'newest';
       }
@@ -101,11 +105,10 @@ export default function ReportsFeedPage() {
         <div className="flex flex-wrap items-center gap-2 pb-2 border-b border-slate-800/80">
           <button
             onClick={() => setActiveTab('all')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-              activeTab === 'all'
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${activeTab === 'all'
                 ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
                 : 'bg-slate-900/60 text-slate-300 hover:text-white hover:bg-slate-800'
-            }`}
+              }`}
           >
             <Layers className="w-3.5 h-3.5" />
             <span>All Complaints</span>
@@ -113,11 +116,10 @@ export default function ReportsFeedPage() {
 
           <button
             onClick={() => setActiveTab('popular')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-              activeTab === 'popular'
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${activeTab === 'popular'
                 ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
                 : 'bg-slate-900/60 text-slate-300 hover:text-white hover:bg-slate-800'
-            }`}
+              }`}
           >
             <Flame className="w-3.5 h-3.5" />
             <span>Most Upvoted & Trending</span>
@@ -125,11 +127,10 @@ export default function ReportsFeedPage() {
 
           <button
             onClick={() => setActiveTab('cleaned')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-              activeTab === 'cleaned'
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${activeTab === 'cleaned'
                 ? 'bg-teal-500 text-slate-950 shadow-md shadow-teal-500/20'
                 : 'bg-slate-900/60 text-slate-300 hover:text-white hover:bg-slate-800'
-            }`}
+              }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>Cleaned Success Stories</span>
@@ -137,15 +138,27 @@ export default function ReportsFeedPage() {
 
           <button
             onClick={() => setActiveTab('critical')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-              activeTab === 'critical'
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${activeTab === 'critical'
                 ? 'bg-rose-500 text-white shadow-md shadow-rose-500/20'
                 : 'bg-slate-900/60 text-slate-300 hover:text-white hover:bg-slate-800'
-            }`}
+              }`}
           >
             <AlertOctagon className="w-3.5 h-3.5" />
             <span>Critical Hazardous</span>
           </button>
+
+          {user?.role === 'cleanup_staff' && (
+            <button
+              onClick={() => setActiveTab('assigned_to_me')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${activeTab === 'assigned_to_me'
+                  ? 'bg-purple-500 text-slate-950 shadow-md shadow-purple-500/20 font-extrabold'
+                  : 'bg-purple-950/40 text-purple-300 hover:text-white hover:bg-purple-900/50 border border-purple-500/30'
+                }`}
+            >
+              <Wrench className="w-3.5 h-3.5" />
+              <span>My Assigned Cleanups</span>
+            </button>
+          )}
         </div>
 
         {/* Filter Controls */}

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `avatar` VARCHAR(500) DEFAULT NULL,
   `bio` TEXT DEFAULT NULL,
   `phone` VARCHAR(30) DEFAULT NULL,
-  `status` ENUM('active', 'banned') NOT NULL DEFAULT 'active',
+  `status` ENUM('active', 'pending_approval', 'banned') NOT NULL DEFAULT 'active',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

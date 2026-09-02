@@ -7,7 +7,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, demoLogin } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -17,15 +17,6 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     const res = await login(email, password);
-    setLoading(false);
-    if (res.success) {
-      navigate(from, { replace: true });
-    }
-  };
-
-  const handleDemo = async (role) => {
-    setLoading(true);
-    const res = await demoLogin(role);
     setLoading(false);
     if (res.success) {
       navigate(from, { replace: true });
@@ -44,48 +35,6 @@ export default function LoginPage() {
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-white">Welcome Back</h1>
           <p className="text-xs text-slate-400">Sign in to your WasteWatch account</p>
-        </div>
-
-        {/* 1-Click Demo Accounts Selector */}
-        <div className="glass-card rounded-2xl p-4 border border-emerald-500/30 bg-emerald-950/20 space-y-2.5">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400 uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Instant 1-Click Demo Logins</span>
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              type="button"
-              onClick={() => handleDemo('citizen')}
-              disabled={loading}
-              className="p-2.5 rounded-xl bg-slate-900 hover:bg-emerald-950/60 border border-slate-700 hover:border-emerald-500/50 text-left transition-all group"
-            >
-              <User className="w-4 h-4 text-emerald-400 mb-1" />
-              <div className="font-bold text-xs text-white group-hover:text-emerald-300">Citizen</div>
-              <div className="text-[10px] text-slate-400">User role</div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleDemo('admin')}
-              disabled={loading}
-              className="p-2.5 rounded-xl bg-slate-900 hover:bg-purple-950/60 border border-slate-700 hover:border-purple-500/50 text-left transition-all group"
-            >
-              <ShieldCheck className="w-4 h-4 text-purple-400 mb-1" />
-              <div className="font-bold text-xs text-white group-hover:text-purple-300">Supervisor</div>
-              <div className="text-[10px] text-slate-400">Admin role</div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleDemo('staff')}
-              disabled={loading}
-              className="p-2.5 rounded-xl bg-slate-900 hover:bg-blue-950/60 border border-slate-700 hover:border-blue-500/50 text-left transition-all group"
-            >
-              <Wrench className="w-4 h-4 text-blue-400 mb-1" />
-              <div className="font-bold text-xs text-white group-hover:text-blue-300">Sanitation</div>
-              <div className="text-[10px] text-slate-400">Staff role</div>
-            </button>
-          </div>
         </div>
 
         {/* Regular Login Form */}

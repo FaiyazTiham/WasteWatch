@@ -29,9 +29,6 @@ export default function Footer() {
               <a href="#" className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-emerald-400 hover:border-emerald-500/40 transition-colors" aria-label="Share">
                 <Share2 className="w-4 h-4" />
               </a>
-              <a href="#" className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-emerald-400 hover:border-emerald-500/40 transition-colors" aria-label="Community">
-                <MessageCircle className="w-4 h-4" />
-              </a>
             </div>
           </div>
 
@@ -84,15 +81,15 @@ export default function Footer() {
             <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2 text-xs">
               <div className="flex items-center gap-2 text-rose-400 font-semibold">
                 <Phone className="w-3.5 h-3.5" />
-                <span>Sanitation Hotline: 311 / 1-800-CLEAN</span>
+                <span>Hotline: +1 (800) 555-0199 / 999</span>
               </div>
               <div className="flex items-center gap-2 text-slate-300">
                 <Mail className="w-3.5 h-3.5 text-emerald-400" />
-                <span>support@wastewatch.org</span>
+                <span>emergency-hotline@wastewatch-ops.org</span>
               </div>
               <div className="flex items-center gap-2 text-slate-400">
                 <MapPin className="w-3.5 h-3.5 text-blue-400" />
-                <span>City Environmental Agency, Sector 4</span>
+                <span>Dhanmondi, Dhaka, Bangladesh</span>
               </div>
             </div>
           </div>

@@ -4,6 +4,7 @@ import { MapPin, ThumbsUp, MessageSquare, Eye, Calendar, Sparkles, ArrowRight } 
 import StatusBadge from './StatusBadge';
 import SeverityBadge from './SeverityBadge';
 import { reportService } from '../../api/apiServices';
+import { getImageUrl } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 
@@ -44,12 +45,14 @@ export default function ReportCard({ report, onUpvoteSuccess }) {
     year: 'numeric'
   });
 
+  const photoUrl = getImageUrl(report.status === 'cleaned' && report.cleaned_photo ? report.cleaned_photo : report.primary_photo);
+
   return (
     <div className="glass-card rounded-2xl overflow-hidden hover:border-emerald-500/40 transition-all duration-300 flex flex-col group hover:-translate-y-1 shadow-lg hover:shadow-2xl">
       {/* Image Container with Badges */}
       <div className="relative aspect-video overflow-hidden bg-slate-900">
         <img
-          src={report.status === 'cleaned' && report.cleaned_photo ? report.cleaned_photo : report.primary_photo}
+          src={photoUrl}
           alt={report.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           onError={(e) => {

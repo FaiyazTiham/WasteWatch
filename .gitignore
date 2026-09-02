@@ -1,34 +1,139 @@
+# ==========================================
 # Dependencies
+# ==========================================
 node_modules/
-client/node_modules/
+*/node_modules/
 .pnp
 .pnp.js
+.pnpm-store/
+.npm/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
 
-# Production Builds
+# ==========================================
+# Production Builds & Bundler Caches
+# ==========================================
+dist/
+dist-ssr/
 client/dist/
 client/dist-ssr/
+build/
+out/
+.cache/
+.vite/
+client/.vite/
+.parcel-cache/
+.turbo/
 *.local
 
-# Environment & Secrets
+# ==========================================
+# Environment Variables & Secrets
+# ==========================================
+.env
+.env.*
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+!.env.example
+!.env.template
+*.pem
+*.key
+*.cert
+*.crt
 
-# Backups & Archives
-*.zip
-*.tar.gz
+# ==========================================
+# User Uploads & Media
+# ==========================================
+server/uploads/*
+!server/uploads/.gitkeep
+uploads/*
+!uploads/.gitkeep
 
+# ==========================================
+# Local Databases & Runtime Stores
+# ==========================================
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.db-wal
+*.dump
+
+# ==========================================
 # Logs
+# ==========================================
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-*.log
 
-# Editor & OS files
-.vscode/
-.idea/
+# ==========================================
+# Testing & Code Coverage
+# ==========================================
+coverage/
+*/coverage/
+.nyc_output/
+.playwright/
+test-results/
+cypress/videos/
+cypress/screenshots/
+
+# ==========================================
+# Linter & Formatter Caches
+# ==========================================
+.eslintcache
+.stylelintcache
+.prettiercache
+
+# ==========================================
+# Backups, Archives & Temporary Files
+# ==========================================
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+*.bak
+*.tmp
+*.temp
+
+# ==========================================
+# Operating System Files
+# ==========================================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ==========================================
+# Editor & IDE Directories
+# ==========================================
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace

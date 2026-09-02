@@ -12,36 +12,30 @@ import { useToast } from '../context/ToastContext';
 export default function HomePage() {
   const [recentReports, setRecentReports] = useState([]);
   const [stats, setStats] = useState({
-    total: 24,
-    cleaned: 16,
-    inProgress: 5,
-    activeUsers: 142
+    total: 0,
+    cleaned: 0,
+    inProgress: 0,
+    activeUsers: 1
   });
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [contactForm, setContactForm] = useState({ name: '', email: '', subject: '', message: '' });
-  const [sendingContact, setSendingContact] = useState(false);
   const navigate = useNavigate();
-  const { success, error } = useToast();
 
   useEffect(() => {
     async function loadData() {
       try {
         setLoading(true);
-        const res = await reportService.getReports({ limit: 6, sort: 'newest' });
-        if (res.data.success) {
-          setRecentReports(res.data.reports || []);
+        const [reportsRes, statsRes] = await Promise.all([
+          reportService.getReports({ limit: 6, sort: 'newest' }),
+          reportService.getStats()
+        ]);
 
-          // Calculate dynamic stats if available
-          const reports = res.data.reports;
-          const cleaned = reports.filter((r) => r.status === 'cleaned' || r.status === 'closed').length;
-          const inProg = reports.filter((r) => r.status === 'in_progress' || r.status === 'assigned').length;
-          setStats({
-            total: reports.length > 0 ? reports.length * 3 + 12 : 24,
-            cleaned: cleaned > 0 ? cleaned * 3 + 8 : 16,
-            inProgress: inProg > 0 ? inProg * 2 + 3 : 5,
-            activeUsers: 186
-          });
+        if (reportsRes.data.success) {
+          setRecentReports(reportsRes.data.reports || []);
+        }
+
+        if (statsRes.data.success && statsRes.data.stats) {
+          setStats(statsRes.data.stats);
         }
       } catch (err) {
         console.warn('Failed to load home data', err);
@@ -58,26 +52,6 @@ export default function HomePage() {
       navigate(`/map?search=${encodeURIComponent(searchQuery.trim())}`);
     } else {
       navigate('/map');
-    }
-  };
-
-  const handleContactSubmit = async (e) => {
-    e.preventDefault();
-    if (!contactForm.name || !contactForm.email || !contactForm.message) {
-      error('Please fill in all required contact fields.');
-      return;
-    }
-    try {
-      setSendingContact(true);
-      const res = await contactService.sendMessage(contactForm);
-      if (res.data.success) {
-        success(res.data.message || 'Message sent! Our support team will get back to you.');
-        setContactForm({ name: '', email: '', subject: '', message: '' });
-      }
-    } catch (err) {
-      error('Failed to submit message.');
-    } finally {
-      setSendingContact(false);
     }
   };
 
@@ -149,7 +123,7 @@ export default function HomePage() {
               <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-3">
                 <Layers className="w-5 h-5" />
               </div>
-              <div className="text-3xl sm:text-4xl font-black text-white mb-1">{stats.total}+</div>
+              <div className="text-3xl sm:text-4xl font-black text-white mb-1">{stats.total}</div>
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Reports</p>
             </div>
 
@@ -157,7 +131,7 @@ export default function HomePage() {
               <div className="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center mb-3">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
-              <div className="text-3xl sm:text-4xl font-black text-emerald-400 mb-1">{stats.cleaned}+</div>
+              <div className="text-3xl sm:text-4xl font-black text-emerald-400 mb-1">{stats.cleaned}</div>
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Cleaned & Restored</p>
             </div>
 
@@ -327,77 +301,58 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Contact Form */}
-          <div id="contact" className="lg:col-span-6 glass-card rounded-2xl p-8 border border-slate-800 shadow-2xl scroll-mt-24">
-            <h3 className="text-xl font-bold text-white mb-1">Get in Touch with WasteWatch</h3>
-            <p className="text-xs text-slate-400 mb-6">Have municipal feedback, cleanup partnerships, or questions?</p>
+          {/* Emergency Contact & Helpline */}
+          <div id="contact" className="lg:col-span-6 glass-card rounded-2xl p-8 border border-rose-500/30 shadow-2xl space-y-6 scroll-mt-24">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs font-bold uppercase tracking-wider mb-2">
+                <Phone className="w-3.5 h-3.5" />
+                <span>24/7 Emergency Municipal Support</span>
+              </div>
+              <h3 className="text-xl font-bold text-white">Emergency Sanitation Contacts</h3>
+              <p className="text-xs text-slate-400 mt-1">Direct hotlines for urgent waste hazards, chemical spillages, and river blockages.</p>
+            </div>
 
-            <form onSubmit={handleContactSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                    Your Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={contactForm.name}
-                    onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                    placeholder="Jane Doe"
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
-                  />
+            <div className="space-y-4">
+              <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold">
+                    <Phone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-400 uppercase font-semibold">24/7 Emergency Hotline</div>
+                    <div className="text-sm font-extrabold text-white font-mono">+1 (800) 555-0199 / 999</div>
+                  </div>
+                </div>
+                <a href="tel:+18005550199" className="px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition-colors">
+                  Call Now
+                </a>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+                    <Mail className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-400 uppercase font-semibold">Emergency Support Email</div>
+                    <div className="text-sm font-extrabold text-white font-mono">emergency-hotline@wastewatch-ops.org</div>
+                  </div>
+                </div>
+                <a href="mailto:emergency-hotline@wastewatch-ops.org" className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors">
+                  Email
+                </a>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold shrink-0">
+                  <MapPin className="w-5 h-5" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                    Your Email *
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={contactForm.email}
-                    onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                    placeholder="jane@example.com"
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
-                  />
+                  <div className="text-xs text-slate-400 uppercase font-semibold">Headquarters & Command Center</div>
+                  <div className="text-xs font-semibold text-slate-200">Dhanmondi, Dhaka, Bangladesh</div>
                 </div>
               </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  value={contactForm.subject}
-                  onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
-                  placeholder="e.g. Volunteer cleanup drive / District inquiry"
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Message *
-                </label>
-                <textarea
-                  rows={4}
-                  required
-                  value={contactForm.message}
-                  onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                  placeholder="Describe your inquiry or question..."
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={sendingContact}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-950"
-              >
-                <Send className="w-4 h-4" />
-                <span>{sendingContact ? 'Sending...' : 'Send Message'}</span>
-              </button>
-            </form>
+            </div>
           </div>
         </div>
       </section>

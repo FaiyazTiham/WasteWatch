@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { Sparkles, AlertOctagon } from 'lucide-react';
+import { getImageUrl } from '../../api/client';
 
 export default function ImageSlider({ beforeImage, afterImage, title = 'Waste Transformation' }) {
   const [sliderPosition, setSliderPosition] = useState(50);
@@ -22,12 +23,15 @@ export default function ImageSlider({ beforeImage, afterImage, title = 'Waste Tr
     if (isDragging) handleMove(e.clientX);
   };
 
+  const beforeSrc = getImageUrl(beforeImage);
+  const afterSrc = getImageUrl(afterImage);
+
   // If afterImage is not available, render a single image preview
   if (!afterImage) {
     return (
       <div className="relative rounded-2xl overflow-hidden aspect-video bg-slate-900 border border-slate-800 shadow-xl group">
         <img
-          src={beforeImage}
+          src={beforeSrc}
           alt={title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           onError={(e) => {
@@ -55,7 +59,7 @@ export default function ImageSlider({ beforeImage, afterImage, title = 'Waste Tr
       >
         {/* Background: Cleaned / After Image */}
         <img
-          src={afterImage}
+          src={afterSrc}
           alt="After Cleanup"
           className="absolute inset-0 w-full h-full object-cover"
           onError={(e) => {
@@ -69,7 +73,7 @@ export default function ImageSlider({ beforeImage, afterImage, title = 'Waste Tr
           style={{ width: `${sliderPosition}%` }}
         >
           <img
-            src={beforeImage}
+            src={beforeSrc}
             alt="Before Cleanup"
             className="absolute inset-0 w-full h-full object-cover max-w-none"
             style={{ width: containerRef.current ? `${containerRef.current.clientWidth}px` : '100%' }}

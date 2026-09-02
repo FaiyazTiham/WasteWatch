@@ -84,15 +84,15 @@ async function seedDatabase() {
     {
       id: 1,
       user_id: 1,
-      title: 'Massive Plastic Dumping Along Pinecrest Riverbank',
-      description: 'Over 200kg of discarded single-use plastic bottles, styrofoam food containers, and broken milk crates accumulated near the river curve, blocking rainwater discharge.',
+      title: 'Massive Plastic Dumping Along Buriganga Riverbank',
+      description: 'Over 200kg of discarded single-use plastic bottles, styrofoam food containers, and broken milk crates accumulated near Sadarghat river curve, blocking rainwater discharge.',
       category_id: 2,
       severity: 'critical',
       status: 'cleaned',
-      latitude: 40.7128,
-      longitude: -74.0060,
-      address: 'Pinecrest Waterfront Trail, Pier 14, River District',
-      area_district: 'River District',
+      latitude: 23.7031,
+      longitude: 90.4125,
+      address: 'Sadarghat Launch Terminal, Buriganga Riverfront, Old Dhaka',
+      area_district: 'Dhaka',
       primary_photo: 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80',
       cleaned_photo: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=80',
       assigned_to: 3,
@@ -106,15 +106,15 @@ async function seedDatabase() {
     {
       id: 2,
       user_id: 4,
-      title: 'Clogged Storm Drain with Overflowing Sewage on 5th Ave',
-      description: 'Heavy blockage in municipal drainage grate creating foul water pooling across the pedestrian crosswalk and bicycle lane.',
+      title: 'Clogged Storm Drain with Overflowing Sewage on Mirpur Road',
+      description: 'Heavy blockage in municipal drainage grate creating foul water pooling across the pedestrian crosswalk near Dhanmondi 27.',
       category_id: 5,
       severity: 'high',
       status: 'in_progress',
-      latitude: 40.7306,
-      longitude: -73.9352,
-      address: 'Corner of 5th Ave & Elm St, Midtown Hub',
-      area_district: 'Midtown',
+      latitude: 23.7548,
+      longitude: 90.3765,
+      address: 'Mirpur Road, Dhanmondi 27, Dhaka',
+      area_district: 'Dhaka',
       primary_photo: 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=800&auto=format&fit=crop&q=80',
       cleaned_photo: null,
       assigned_to: 3,
@@ -128,15 +128,15 @@ async function seedDatabase() {
     {
       id: 3,
       user_id: 1,
-      title: 'Illegal Demolition Rubble Dumped near Community School',
-      description: 'Broken concrete slabs, exposed reinforcement rebar, plaster boards, and tile shards dumped beside the Oakridge Elementary playground fence.',
+      title: 'Illegal Demolition Rubble Dumped near Gulshan Avenue',
+      description: 'Broken concrete slabs, exposed reinforcement rebar, plaster boards, and tile shards dumped beside Gulshan Lake Park fence.',
       category_id: 3,
       severity: 'high',
       status: 'assigned',
-      latitude: 40.7589,
-      longitude: -73.9851,
-      address: '742 Oakridge Ave, North Valley Suburb',
-      area_district: 'North Valley',
+      latitude: 23.7925,
+      longitude: 90.4078,
+      address: 'Gulshan Avenue, Road 71, Gulshan 2, Dhaka',
+      area_district: 'Dhaka',
       primary_photo: 'https://images.unsplash.com/photo-1503596476-1c12a8ba09a9?w=800&auto=format&fit=crop&q=80',
       cleaned_photo: null,
       assigned_to: 5,
@@ -150,15 +150,15 @@ async function seedDatabase() {
     {
       id: 4,
       user_id: 4,
-      title: 'Overflowing Household Bins and Debris at Market Alley',
-      description: 'Commercial and residential garbage bins overflowing onto the sidewalk, creating pest attraction and blocking storefront access.',
+      title: 'Overflowing Household Bins and Debris at Agrabad Market',
+      description: 'Commercial and residential garbage bins overflowing onto the sidewalk in Agrabad commercial area.',
       category_id: 1,
       severity: 'medium',
       status: 'verified',
-      latitude: 40.7180,
-      longitude: -73.9980,
-      address: 'Market Square Alley #4, Downtown',
-      area_district: 'Downtown',
+      latitude: 22.3275,
+      longitude: 91.8123,
+      address: 'Agrabad Commercial Area, Chattogram',
+      area_district: 'Chattogram',
       primary_photo: 'https://images.unsplash.com/photo-1528323273322-d81458248d40?w=800&auto=format&fit=crop&q=80',
       cleaned_photo: null,
       assigned_to: null,
@@ -172,15 +172,15 @@ async function seedDatabase() {
     {
       id: 5,
       user_id: 1,
-      title: 'Discarded Chemical Drums near Greenway Industrial Canal',
+      title: 'Discarded Chemical Drums near Karnaphuli Riverbank',
       description: 'Three unsealed metal drums with rusty corrosion and chemical odor observed near the water runoff edge.',
       category_id: 4,
       severity: 'critical',
       status: 'reported',
-      latitude: 40.6782,
-      longitude: -74.0445,
-      address: 'Greenway Industrial Park, Gate 9, East Harbor',
-      area_district: 'East Harbor',
+      latitude: 22.3361,
+      longitude: 91.8385,
+      address: 'Karnaphuli River Port Area, Chattogram',
+      area_district: 'Chattogram',
       primary_photo: 'https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?w=800&auto=format&fit=crop&q=80',
       cleaned_photo: null,
       assigned_to: null,
@@ -194,15 +194,15 @@ async function seedDatabase() {
     {
       id: 6,
       user_id: 4,
-      title: 'Major Highway Median Trash Accumulation on Highway 101',
-      description: 'Blown tires, fast food containers, plastic tarps, and packaging cluttering the center divider along mile marker 14.',
+      title: 'Major Highway Median Trash Accumulation on Dhaka-Sylhet Highway',
+      description: 'Blown tires, fast food containers, plastic tarps, and packaging cluttering the center divider along Kanchpur Bridge.',
       category_id: 6,
       severity: 'medium',
       status: 'cleaned',
-      latitude: 40.7831,
-      longitude: -73.9712,
-      address: 'State Route 101, Milepost 14 Westbound',
-      area_district: 'West Highway Corridor',
+      latitude: 23.7081,
+      longitude: 90.5283,
+      address: 'Dhaka-Sylhet Highway, Kanchpur Bridge Area',
+      area_district: 'Narayanganj',
       primary_photo: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=800&auto=format&fit=crop&q=80',
       cleaned_photo: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=800&auto=format&fit=crop&q=80',
       assigned_to: 3,
@@ -216,15 +216,15 @@ async function seedDatabase() {
     {
       id: 7,
       user_id: 1,
-      title: 'Oil Slick and Plastic Bottles in Lakeview Public Pond',
-      description: 'Surface petroleum sheen and dozens of floating plastic soda bottles trapping waterfowl near the observation deck.',
+      title: 'Oil Slick and Plastic Bottles in Dhanmondi Lake',
+      description: 'Surface petroleum sheen and dozens of floating plastic soda bottles trapping waterfowl near the Rabindra Sarobar stage.',
       category_id: 7,
       severity: 'high',
       status: 'in_progress',
-      latitude: 40.7484,
-      longitude: -73.9857,
-      address: 'Lakeview Memorial Park, South Pond Deck',
-      area_district: 'Central Parkview',
+      latitude: 23.7461,
+      longitude: 90.3742,
+      address: 'Rabindra Sarobar, Dhanmondi Lake, Dhaka',
+      area_district: 'Dhaka',
       primary_photo: 'https://images.unsplash.com/photo-1621451537084-482c73073a0f?w=800&auto=format&fit=crop&q=80',
       cleaned_photo: null,
       assigned_to: 5,
@@ -232,6 +232,28 @@ async function seedDatabase() {
       cleaned_at: null,
       closed_at: null,
       views_count: 310,
+      created_at: new Date(Date.now() - 3 * 86400000).toISOString(),
+      updated_at: new Date(Date.now() - 12 * 3600000).toISOString()
+    },
+    {
+      id: 8,
+      user_id: 4,
+      title: 'Discarded Electronics & Glass Batteries at Lakeview Deck',
+      description: 'Hazardous e-waste piles including CRT screens, rusted batteries, and shattered glass near the park trail.',
+      category_id: 8,
+      severity: 'high',
+      status: 'in_progress',
+      latitude: 23.7501,
+      longitude: 90.3789,
+      address: 'Lakeview Park Deck, South Pond Trail',
+      area_district: 'Dhaka',
+      primary_photo: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=800&auto=format&fit=crop&q=80',
+      cleaned_photo: null,
+      assigned_to: 5,
+      verified_at: new Date(Date.now() - 2 * 86400000).toISOString(),
+      cleaned_at: null,
+      closed_at: null,
+      views_count: 140,
       created_at: new Date(Date.now() - 3 * 86400000).toISOString(),
       updated_at: new Date(Date.now() - 12 * 3600000).toISOString()
     }
@@ -279,41 +301,26 @@ async function seedDatabase() {
   // Seed MySQL if active
   if (db.isMysqlActive) {
     try {
-      const [existingUsers] = await db.query('SELECT COUNT(*) as count FROM users');
-      if (existingUsers && existingUsers[0].count === 0) {
-        console.log('[Seed] Populating MySQL tables with initial dataset...');
-        for (const u of users) {
-          await db.query(
-            'INSERT INTO users (id, name, email, password_hash, role, avatar, bio, phone, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [u.id, u.name, u.email, u.password_hash, u.role, u.avatar, u.bio, u.phone, u.status, u.created_at]
-          );
-        }
+      const [catRows] = await db.getPool().query('SELECT COUNT(*) as count FROM categories');
+      if (catRows && Number(catRows[0].count) === 0) {
+        console.log('[Seed] Populating MySQL categories table...');
         for (const c of categories) {
-          await db.query(
-            'INSERT INTO categories (id, name, slug, description, icon, color) VALUES (?, ?, ?, ?, ?, ?)',
+          await db.getPool().query(
+            'INSERT IGNORE INTO categories (id, name, slug, description, icon, color) VALUES (?, ?, ?, ?, ?, ?)',
             [c.id, c.name, c.slug, c.description, c.icon, c.color]
           );
         }
-        for (const r of reports) {
-          await db.query(
-            `INSERT INTO reports (id, user_id, title, description, category_id, severity, status, latitude, longitude, address, area_district, primary_photo, cleaned_photo, assigned_to, verified_at, cleaned_at, closed_at, views_count, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [r.id, r.user_id, r.title, r.description, r.category_id, r.severity, r.status, r.latitude, r.longitude, r.address, r.area_district, r.primary_photo, r.cleaned_photo, r.assigned_to, r.verified_at, r.cleaned_at, r.closed_at, r.views_count, r.created_at, r.updated_at]
+      }
+
+      const [userRows] = await db.getPool().query('SELECT COUNT(*) as count FROM users');
+      if (userRows && Number(userRows[0].count) === 0) {
+        console.log('[Seed] Populating MySQL users table...');
+        for (const u of users) {
+          await db.getPool().query(
+            'INSERT IGNORE INTO users (id, name, email, password_hash, role, avatar, bio, phone, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [u.id, u.name, u.email, u.password_hash, u.role, u.avatar, u.bio, u.phone, u.status, u.created_at]
           );
         }
-        for (const u of upvotes) {
-          await db.query('INSERT INTO upvotes (id, report_id, user_id, created_at) VALUES (?, ?, ?, ?)', [u.id, u.report_id, u.user_id, u.created_at]);
-        }
-        for (const c of comments) {
-          await db.query('INSERT INTO comments (id, report_id, user_id, content, created_at) VALUES (?, ?, ?, ?, ?)', [c.id, c.report_id, c.user_id, c.content, c.created_at]);
-        }
-        for (const l of statusLogs) {
-          await db.query('INSERT INTO report_status_logs (id, report_id, changed_by_user_id, from_status, to_status, notes, photo_url, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [l.id, l.report_id, l.changed_by_user_id, l.from_status, l.to_status, l.notes, l.photo_url, l.created_at]);
-        }
-        for (const n of notifications) {
-          await db.query('INSERT INTO notifications (id, user_id, title, message, type, link_url, is_read, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [n.id, n.user_id, n.title, n.message, n.type, n.link_url, n.is_read, n.created_at]);
-        }
-        console.log('[Seed] MySQL initial seeding complete!');
       }
     } catch (e) {
       console.warn('[Seed] MySQL seed warning:', e.message);

@@ -44,11 +44,12 @@ export default function LocationPickerMap({
   longitude,
   onLocationChange,
   address,
-  onAddressChange
+  onAddressChange,
+  onAreaDistrictChange
 }) {
   const [position, setPosition] = useState({
-    lat: Number(latitude) || 40.7128,
-    lng: Number(longitude) || -74.0060
+    lat: Number(latitude) || 23.8103,
+    lng: Number(longitude) || 90.4125
   });
   const [detecting, setDetecting] = useState(false);
 
@@ -69,6 +70,12 @@ export default function LocationPickerMap({
         const addr = res.data.display_name;
         if (onAddressChange) {
           onAddressChange(addr);
+        }
+
+        if (onAreaDistrictChange && res.data.address) {
+          const a = res.data.address;
+          const district = a.city_district || a.suburb || a.city || a.county || a.state_district || 'Metropolitan';
+          onAreaDistrictChange(district);
         }
       }
     } catch (err) {
@@ -103,7 +110,7 @@ export default function LocationPickerMap({
         console.warn('Geolocation error:', err.message);
         setDetecting(false);
         // Fallback to default
-        handleSelect(40.7128, -74.0060);
+        handleSelect(23.8103, 90.4125);
       },
       { timeout: 10000, enableHighAccuracy: true }
     );
@@ -135,8 +142,10 @@ export default function LocationPickerMap({
           className="w-full h-full cursor-crosshair"
         >
           <TileLayer
-            attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
-            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+            attribution='&copy; Google Maps'
+            url="https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+            subdomains={['0', '1', '2', '3']}
+            maxZoom={20}
           />
           <MapClickHandler onLocationSelect={handleSelect} />
           <CenterMap coords={position} />

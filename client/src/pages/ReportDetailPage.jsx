@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   MapPin, ThumbsUp, MessageSquare, Share2, Flag, Calendar,
-  Clock, User, CheckCircle2, AlertOctagon, Wrench, ShieldCheck,
+  Clock, User, CheckCircle2, AlertOctagon, Wrench, ShieldCheck, ShieldAlert,
   ChevronRight, Trash2, ArrowLeft, Send, Sparkles, UserCheck, Eye
 } from 'lucide-react';
 import { reportService } from '../api/apiServices';
+import { getImageUrl } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import StatusBadge from '../components/common/StatusBadge';
@@ -167,7 +168,7 @@ export default function ReportDetailPage() {
 
         <div className="flex items-center gap-2">
           {/* Staff / Admin Status Update Button */}
-          {isStaff && (
+          {user && (isAdmin || (user.role === 'cleanup_staff' && Number(report.assigned_to) === Number(user.id))) ? (
             <button
               onClick={() => setStatusModalOpen(true)}
               className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 transition-colors shadow-md shadow-purple-950"
@@ -175,7 +176,12 @@ export default function ReportDetailPage() {
               <Wrench className="w-4 h-4" />
               <span>Update Lifecycle Status</span>
             </button>
-          )}
+          ) : user && user.role === 'cleanup_staff' ? (
+            <div className="px-3.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 text-xs font-semibold flex items-center gap-1.5">
+              <ShieldAlert className="w-4 h-4 text-amber-400" />
+              <span>Assigned to another staff member (Read Only)</span>
+            </div>
+          ) : null}
 
           {/* Delete Option for Reporter or Admin */}
           {(isAdmin || (user && Number(user.id) === Number(report.user_id))) && (
@@ -223,24 +229,22 @@ export default function ReportDetailPage() {
             return (
               <div key={st} className="flex flex-col items-center text-center space-y-2">
                 <div
-                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm transition-all ${
-                    isCurrent
+                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm transition-all ${isCurrent
                       ? 'bg-emerald-500 text-slate-950 ring-4 ring-emerald-500/30 shadow-lg shadow-emerald-500/30 scale-105'
                       : isCompleted
-                      ? 'bg-emerald-950 border border-emerald-500 text-emerald-300'
-                      : 'bg-slate-900 border border-slate-800 text-slate-600'
-                  }`}
+                        ? 'bg-emerald-950 border border-emerald-500 text-emerald-300'
+                        : 'bg-slate-900 border border-slate-800 text-slate-600'
+                    }`}
                 >
                   {isCompleted ? <CheckCircle2 className="w-4 h-4" /> : idx + 1}
                 </div>
                 <span
-                  className={`text-[10px] sm:text-xs font-semibold uppercase tracking-wider capitalize ${
-                    isCurrent
+                  className={`text-[10px] sm:text-xs font-semibold uppercase tracking-wider capitalize ${isCurrent
                       ? 'text-emerald-300'
                       : isCompleted
-                      ? 'text-slate-300'
-                      : 'text-slate-600'
-                  }`}
+                        ? 'text-slate-300'
+                        : 'text-slate-600'
+                    }`}
                 >
                   {st.replace('_', ' ')}
                 </span>
@@ -275,7 +279,7 @@ export default function ReportDetailPage() {
                 <div className="grid grid-cols-4 gap-3">
                   {report.photos.map((p, idx) => (
                     <div key={idx} className="rounded-xl overflow-hidden aspect-video border border-slate-700 bg-slate-900">
-                      <img src={p.photo_url} alt="Extra" className="w-full h-full object-cover" />
+                      <img src={getImageUrl(p.photo_url)} alt="Extra" className="w-full h-full object-cover" />
                     </div>
                   ))}
                 </div>
@@ -314,11 +318,10 @@ export default function ReportDetailPage() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleUpvote}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm border transition-all ${
-                    upvoted
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm border transition-all ${upvoted
                       ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 shadow-lg shadow-emerald-500/10'
                       : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
-                  }`}
+                    }`}
                 >
                   <ThumbsUp className={`w-4 h-4 ${upvoted ? 'fill-emerald-400 text-emerald-400' : ''}`} />
                   <span>{upvoted ? 'Upvoted' : 'Upvote Complaint'}</span>
@@ -474,7 +477,7 @@ export default function ReportDetailPage() {
 
             <div className="relative rounded-2xl overflow-hidden border border-slate-700 h-48 bg-slate-900">
               <MapContainer
-                center={[Number(report.latitude) || 40.7128, Number(report.longitude) || -74.0060]}
+                center={[Number(report.latitude) || 23.8103, Number(report.longitude) || 90.4125]}
                 zoom={14}
                 scrollWheelZoom={false}
                 zoomControl={false}
@@ -485,7 +488,7 @@ export default function ReportDetailPage() {
                   url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
                 />
                 <Marker
-                  position={[Number(report.latitude) || 40.7128, Number(report.longitude) || -74.0060]}
+                  position={[Number(report.latitude) || 23.8103, Number(report.longitude) || 90.4125]}
                   icon={detailPin}
                 />
               </MapContainer>

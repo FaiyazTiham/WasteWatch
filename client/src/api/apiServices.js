@@ -15,6 +15,7 @@ export const authService = {
 
 // Report Services
 export const reportService = {
+  getStats: () => api.get('/reports/stats'),
   getCategories: () => api.get('/reports/categories'),
   getReports: (params) => api.get('/reports', { params }),
   getReportById: (id) => api.get(`/reports/${id}`),
@@ -37,6 +38,9 @@ export const adminService = {
   getUsers: () => api.get('/admin/users'),
   updateUserRole: (userId, role) => api.put(`/admin/users/${userId}/role`, { role }),
   toggleUserBan: (userId) => api.put(`/admin/users/${userId}/ban`),
+  approveUser: (userId) => api.put(`/admin/users/${userId}/approve`),
+  rejectUser: (userId) => api.put(`/admin/users/${userId}/reject`),
+  deleteUser: (userId) => api.delete(`/admin/users/${userId}`),
   createCategory: (data) => api.post('/admin/categories', data),
   getFlags: () => api.get('/admin/flags'),
   resolveFlag: (flagId, action) => api.post(`/admin/flags/${flagId}/resolve`, { action })

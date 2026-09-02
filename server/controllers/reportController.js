@@ -28,6 +28,55 @@ async function createNotification({ userId, title, message, type = 'system', lin
   }
 }
 
+// Get Public Homepage Statistics (Live real counts)
+exports.getPublicStats = async (req, res) => {
+  try {
+    if (db.isMysqlActive) {
+      const [repRows] = await db.getPool().query(`
+        SELECT 
+          COUNT(*) as total,
+          SUM(CASE WHEN status IN ('cleaned', 'closed') THEN 1 ELSE 0 END) as cleaned,
+          SUM(CASE WHEN status IN ('in_progress', 'assigned') THEN 1 ELSE 0 END) as in_progress
+        FROM reports
+      `);
+
+      const [userRows] = await db.getPool().query(`
+        SELECT COUNT(*) as total FROM users WHERE status = 'active'
+      `);
+
+      return res.json({
+        success: true,
+        stats: {
+          total: repRows[0]?.total || 0,
+          cleaned: repRows[0]?.cleaned || 0,
+          inProgress: repRows[0]?.in_progress || 0,
+          activeUsers: userRows[0]?.total || 0
+        }
+      });
+    }
+
+    const reports = db.fallbackStore.data.reports || [];
+    const users = db.fallbackStore.data.users || [];
+
+    const total = reports.length;
+    const cleaned = reports.filter(r => r.status === 'cleaned' || r.status === 'closed').length;
+    const inProgress = reports.filter(r => r.status === 'in_progress' || r.status === 'assigned').length;
+    const activeUsers = users.filter(u => u.status === 'active').length;
+
+    return res.json({
+      success: true,
+      stats: {
+        total,
+        cleaned,
+        inProgress,
+        activeUsers
+      }
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Failed to fetch statistics', error: err.message });
+  }
+};
+
 // 1. Get All Reports with Advanced Filters
 exports.getReports = async (req, res) => {
   try {
@@ -38,6 +87,7 @@ exports.getReports = async (req, res) => {
       search,
       district,
       sort = 'newest',
+      assigned_to,
       page = 1,
       limit = 50
     } = req.query;
@@ -64,6 +114,10 @@ exports.getReports = async (req, res) => {
         conditions.push('r.area_district LIKE ?');
         params.push(`%${district}%`);
       }
+      if (assigned_to && assigned_to !== 'all') {
+        conditions.push('r.assigned_to = ?');
+        params.push(Number(assigned_to));
+      }
       if (search && search.trim()) {
         conditions.push('(r.title LIKE ? OR r.description LIKE ? OR r.address LIKE ? OR r.area_district LIKE ?)');
         const s = `%${search.trim()}%`;
@@ -89,8 +143,8 @@ exports.getReports = async (req, res) => {
                (SELECT COUNT(*) FROM comments WHERE report_id = r.id) as comments_count,
                ${currentUserId ? '(SELECT COUNT(*) > 0 FROM upvotes WHERE report_id = r.id AND user_id = ' + Number(currentUserId) + ')' : '0'} as has_upvoted
         FROM reports r
-        JOIN users u ON r.user_id = u.id
-        JOIN categories c ON r.category_id = c.id
+        LEFT JOIN users u ON r.user_id = u.id
+        LEFT JOIN categories c ON r.category_id = c.id
         WHERE ${conditions.join(' AND ')}
         ORDER BY ${orderBy}
         LIMIT ? OFFSET ?
@@ -137,6 +191,9 @@ exports.getReports = async (req, res) => {
     if (district && district !== 'all') {
       result = result.filter(r => r.area_district?.toLowerCase().includes(district.toLowerCase()));
     }
+    if (assigned_to && assigned_to !== 'all') {
+      result = result.filter(r => Number(r.assigned_to) === Number(assigned_to));
+    }
     if (search && search.trim()) {
       const q = search.trim().toLowerCase();
       result = result.filter(r =>
@@ -170,6 +227,9 @@ exports.getReports = async (req, res) => {
 exports.getReportById = async (req, res) => {
   try {
     const reportId = req.params.id;
+    if (isNaN(reportId)) {
+      return res.status(400).json({ success: false, message: 'Invalid report ID.' });
+    }
     const currentUserId = req.user ? req.user.id : null;
 
     if (db.isMysqlActive) {
@@ -322,7 +382,7 @@ exports.createReport = async (req, res) => {
       });
     }
 
-    let primaryPhoto = photo_url || 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80';
+    let primaryPhoto = photo_url || req.body.primary_photo || 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80';
     if (req.files && req.files.length > 0) {
       primaryPhoto = `/uploads/${req.files[0].filename}`;
     } else if (req.file) {
@@ -365,10 +425,12 @@ exports.createReport = async (req, res) => {
         linkUrl: `/reports/${reportId}`
       });
 
+      const newReport = { id: reportId, title: title.trim(), description: description.trim(), category_id: Number(category_id), severity, status: 'reported' };
       return res.status(201).json({
         success: true,
         message: 'Waste report submitted successfully!',
-        reportId
+        reportId,
+        report: newReport
       });
     }
 
@@ -463,6 +525,14 @@ exports.updateReportStatus = async (req, res) => {
       if (rows.length === 0) return res.status(404).json({ success: false, message: 'Report not found' });
       report = rows[0];
 
+      // Staff Permission Check: Staff can ONLY update reports assigned to them
+      if (req.user.role === 'cleanup_staff' && Number(report.assigned_to) !== Number(changedByUserId)) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. You can only update waste reports that are assigned to you.'
+        });
+      }
+
       const fromStatus = report.status;
       const toStatus = status || fromStatus;
 
@@ -474,7 +544,9 @@ exports.updateReportStatus = async (req, res) => {
       if (toStatus === 'cleaned' && !cleanedAt) cleanedAt = new Date();
       if (toStatus === 'closed' && !closedAt) closedAt = new Date();
 
-      const finalAssignedTo = assigned_to !== undefined ? (assigned_to ? Number(assigned_to) : null) : report.assigned_to;
+      const finalAssignedTo = req.user.role === 'cleanup_staff'
+        ? report.assigned_to
+        : (assigned_to !== undefined ? (assigned_to ? Number(assigned_to) : null) : report.assigned_to);
       const finalCleanedPhoto = afterPhoto || report.cleaned_photo;
 
       await db.getPool().query(
@@ -496,6 +568,17 @@ exports.updateReportStatus = async (req, res) => {
         [reportId, changedByUserId, fromStatus, toStatus, notes || `Status updated to ${toStatus}`, afterPhoto]
       );
 
+      // Notify assigned staff member if newly assigned
+      if (finalAssignedTo && Number(finalAssignedTo) !== Number(report.assigned_to)) {
+        await createNotification({
+          userId: finalAssignedTo,
+          title: 'New Cleanup Assignment 🧹',
+          message: `You have been assigned to handle report #${reportId}: "${report.title.slice(0, 35)}...".`,
+          type: 'assignment',
+          linkUrl: `/reports/${reportId}`
+        });
+      }
+
       // Notify reporter
       await createNotification({
         userId: report.user_id,
@@ -512,6 +595,14 @@ exports.updateReportStatus = async (req, res) => {
     report = db.fallbackStore.data.reports.find(r => Number(r.id) === Number(reportId));
     if (!report) return res.status(404).json({ success: false, message: 'Report not found' });
 
+    // Staff Permission Check: Staff can ONLY update reports assigned to them
+    if (req.user.role === 'cleanup_staff' && Number(report.assigned_to) !== Number(changedByUserId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. You can only update waste reports that are assigned to you.'
+      });
+    }
+
     const fromStatus = report.status;
     const toStatus = status || fromStatus;
 
@@ -519,8 +610,11 @@ exports.updateReportStatus = async (req, res) => {
     if (toStatus === 'cleaned' && !report.cleaned_at) report.cleaned_at = new Date().toISOString();
     if (toStatus === 'closed' && !report.closed_at) report.closed_at = new Date().toISOString();
 
+    const previousAssignedTo = report.assigned_to;
     report.status = toStatus;
-    if (assigned_to !== undefined) report.assigned_to = assigned_to ? Number(assigned_to) : null;
+    if (req.user.role !== 'cleanup_staff' && assigned_to !== undefined) {
+      report.assigned_to = assigned_to ? Number(assigned_to) : null;
+    }
     if (afterPhoto) report.cleaned_photo = afterPhoto;
     report.updated_at = new Date().toISOString();
 
@@ -536,6 +630,17 @@ exports.updateReportStatus = async (req, res) => {
     });
 
     db.fallbackStore.save();
+
+    // Notify assigned staff member if newly assigned
+    if (report.assigned_to && Number(report.assigned_to) !== Number(previousAssignedTo)) {
+      await createNotification({
+        userId: report.assigned_to,
+        title: 'New Cleanup Assignment 🧹',
+        message: `You have been assigned to handle report #${reportId}: "${report.title.slice(0, 35)}...".`,
+        type: 'assignment',
+        linkUrl: `/reports/${reportId}`
+      });
+    }
 
     await createNotification({
       userId: report.user_id,
@@ -717,6 +822,16 @@ exports.flagReport = async (req, res) => {
         'INSERT INTO flags (report_id, user_id, reason, details, status) VALUES (?, ?, ?, ?, "pending")',
         [reportId, userId, reason, details || null]
       );
+      const [admins] = await db.getPool().query('SELECT id FROM users WHERE role = "admin" AND status = "active"');
+      for (const admin of admins) {
+        await createNotification({
+          userId: admin.id,
+          title: 'Flagged Report Queue ⚠️',
+          message: `Report #${reportId} was flagged for "${reason}" by a citizen.`,
+          type: 'flag',
+          linkUrl: '/admin/moderation'
+        });
+      }
     } else {
       db.fallbackStore.data.flags.push({
         id: db.fallbackStore.getNextId('flags'),
@@ -728,6 +843,17 @@ exports.flagReport = async (req, res) => {
         created_at: new Date().toISOString()
       });
       db.fallbackStore.save();
+
+      const admins = db.fallbackStore.data.users.filter(u => u.role === 'admin' && u.status === 'active');
+      for (const admin of admins) {
+        await createNotification({
+          userId: admin.id,
+          title: 'Flagged Report Queue ⚠️',
+          message: `Report #${reportId} was flagged for "${reason}" by a citizen.`,
+          type: 'flag',
+          linkUrl: '/admin/moderation'
+        });
+      }
     }
 
     return res.json({ success: true, message: 'Thank you. The report has been flagged for municipal moderation.' });

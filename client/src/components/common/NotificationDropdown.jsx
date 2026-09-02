@@ -137,9 +137,8 @@ export default function NotificationDropdown() {
               notifications.slice(0, 6).map((n) => (
                 <div
                   key={n.id}
-                  className={`p-3.5 hover:bg-slate-800/50 transition-colors flex items-start gap-3 relative group ${
-                    !n.is_read ? 'bg-slate-800/30' : ''
-                  }`}
+                  className={`p-3.5 hover:bg-slate-800/50 transition-colors flex items-start gap-3 relative group ${!n.is_read ? 'bg-slate-800/30' : ''
+                    }`}
                 >
                   <div className="w-8 h-8 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center shrink-0 mt-0.5">
                     {getIcon(n.type)}

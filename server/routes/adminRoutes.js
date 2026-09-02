@@ -11,6 +11,9 @@ router.get('/staff', requireAuth, requireRole(['admin', 'cleanup_staff']), admin
 router.get('/users', requireAuth, requireRole('admin'), adminController.getAllUsers);
 router.put('/users/:userId/role', requireAuth, requireRole('admin'), adminController.updateUserRole);
 router.put('/users/:userId/ban', requireAuth, requireRole('admin'), adminController.toggleUserBan);
+router.put('/users/:userId/approve', requireAuth, requireRole('admin'), adminController.approveUser);
+router.put('/users/:userId/reject', requireAuth, requireRole('admin'), adminController.rejectUser);
+router.delete('/users/:userId', requireAuth, requireRole('admin'), adminController.deleteUser);
 
 // Category Management
 router.post('/categories', requireAuth, requireRole('admin'), adminController.createCategory);

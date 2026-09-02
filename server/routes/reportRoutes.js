@@ -4,7 +4,8 @@ const reportController = require('../controllers/reportController');
 const { requireAuth, optionalAuth, requireRole } = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
-// Categories
+// Stats & Categories
+router.get('/stats', reportController.getPublicStats);
 router.get('/categories', reportController.getCategories);
 
 // Reports query & single report

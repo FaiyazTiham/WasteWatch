@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Link } from 'react-router-dom';
 import StatusBadge from '../common/StatusBadge';
 import SeverityBadge from '../common/SeverityBadge';
 import { ArrowRight, MapPin } from 'lucide-react';
+import { getImageUrl } from '../../api/client';
 
 // Status-based Pin Marker Factory
 const createCustomIcon = (status, severity) => {
@@ -47,7 +48,7 @@ function MapController({ reports, center, zoom }) {
       map.flyTo(center, zoom || 14, { duration: 1.2 });
     } else if (reports && reports.length > 0) {
       const bounds = L.latLngBounds(
-        reports.map((r) => [Number(r.latitude) || 40.7128, Number(r.longitude) || -74.0060])
+        reports.map((r) => [Number(r.latitude) || 23.8103, Number(r.longitude) || 90.4125])
       );
       if (bounds.isValid()) {
         map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
@@ -63,23 +64,84 @@ export default function WasteMap({
   selectedReportId = null,
   onSelectReport = null,
   center = null,
-  zoom = 13,
+  zoom = 12,
   height = '550px'
 }) {
-  const defaultCenter = [40.7128, -74.0060]; // Default city hub
+  const defaultCenter = [23.8103, 90.4125]; // Dhaka, Bangladesh
+  const [mapType, setMapType] = useState('google_roadmap'); // 'google_roadmap', 'google_satellite', 'google_hybrid', 'osm'
+
+  const tileProviders = {
+    google_roadmap: {
+      url: 'https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+      subdomains: ['0', '1', '2', '3'],
+      attribution: '&copy; Google Maps'
+    },
+    google_satellite: {
+      url: 'https://mt{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+      subdomains: ['0', '1', '2', '3'],
+      attribution: '&copy; Google Maps Satellite'
+    },
+    google_hybrid: {
+      url: 'https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+      subdomains: ['0', '1', '2', '3'],
+      attribution: '&copy; Google Maps Hybrid'
+    },
+    osm: {
+      url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+      subdomains: ['a', 'b', 'c', 'd'],
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+    }
+  };
+
+  const currentTile = tileProviders[mapType] || tileProviders.google_roadmap;
 
   return (
     <div className="relative rounded-2xl overflow-hidden border border-slate-800 shadow-2xl z-0" style={{ height }}>
+      {/* Google Maps Layer Switcher Control */}
+      <div className="absolute top-3 right-3 z-[1000] flex items-center gap-1 bg-slate-900/90 backdrop-blur-md p-1.5 rounded-xl border border-slate-700/80 shadow-xl text-xs">
+        <button
+          type="button"
+          onClick={() => setMapType('google_roadmap')}
+          className={`px-2.5 py-1 rounded-lg font-bold transition-all ${mapType === 'google_roadmap' ? 'bg-emerald-500 text-slate-950 shadow-md' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}
+        >
+          🗺️ Google Map
+        </button>
+        <button
+          type="button"
+          onClick={() => setMapType('google_satellite')}
+          className={`px-2.5 py-1 rounded-lg font-bold transition-all ${mapType === 'google_satellite' ? 'bg-emerald-500 text-slate-950 shadow-md' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}
+        >
+          🛰️ Satellite
+        </button>
+        <button
+          type="button"
+          onClick={() => setMapType('google_hybrid')}
+          className={`px-2.5 py-1 rounded-lg font-bold transition-all ${mapType === 'google_hybrid' ? 'bg-emerald-500 text-slate-950 shadow-md' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}
+        >
+          🏙️ Hybrid
+        </button>
+        <button
+          type="button"
+          onClick={() => setMapType('osm')}
+          className={`px-2.5 py-1 rounded-lg font-bold transition-all ${mapType === 'osm' ? 'bg-emerald-500 text-slate-950 shadow-md' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}
+        >
+          🌐 OSM
+        </button>
+      </div>
+
       <MapContainer
         center={center || (reports.length > 0 ? [reports[0].latitude, reports[0].longitude] : defaultCenter)}
         zoom={zoom}
         scrollWheelZoom={true}
         className="w-full h-full"
       >
-        {/* Modern Crisp Tile Layer */}
+        {/* Dynamic Tile Layer (Google Maps / Satellite / OSM) */}
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          key={mapType}
+          attribution={currentTile.attribution}
+          url={currentTile.url}
+          subdomains={currentTile.subdomains}
+          maxZoom={20}
         />
 
         <MapController reports={reports} center={center} zoom={zoom} />
@@ -106,7 +168,7 @@ export default function WasteMap({
                 <div className="w-64 p-3 bg-slate-900 text-slate-100 rounded-xl overflow-hidden">
                   <div className="relative aspect-video rounded-lg overflow-hidden mb-2.5 bg-slate-800">
                     <img
-                      src={r.status === 'cleaned' && r.cleaned_photo ? r.cleaned_photo : r.primary_photo}
+                      src={getImageUrl(r.status === 'cleaned' && r.cleaned_photo ? r.cleaned_photo : r.primary_photo)}
                       alt={r.title}
                       className="w-full h-full object-cover"
                       onError={(e) => {

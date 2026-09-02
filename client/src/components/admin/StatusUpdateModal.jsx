@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, CheckCircle2, Upload, UserCheck, ShieldAlert, Sparkles } from 'lucide-react';
 import { reportService, adminService } from '../../api/apiServices';
+import { getImageUrl } from '../../api/client';
+import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 
 const STATUS_STEPS = [
@@ -13,6 +15,13 @@ const STATUS_STEPS = [
 ];
 
 export default function StatusUpdateModal({ isOpen, onClose, report, onSuccess }) {
+  const { user } = useAuth();
+  const isStaff = user?.role === 'cleanup_staff';
+  const isAdmin = user?.role === 'admin';
+
+  const availableSteps = isStaff
+    ? STATUS_STEPS.filter((s) => ['assigned', 'in_progress', 'cleaned'].includes(s.value))
+    : STATUS_STEPS;
   const [status, setStatus] = useState('verified');
   const [assignedTo, setAssignedTo] = useState('');
   const [notes, setNotes] = useState('');
@@ -30,7 +39,7 @@ export default function StatusUpdateModal({ isOpen, onClose, report, onSuccess }
       setNotes('');
       setCleanedPhotoFile(null);
       setCleanedPhotoUrl(report.cleaned_photo || '');
-      setPhotoPreview(report.cleaned_photo || null);
+      setPhotoPreview(report.cleaned_photo ? getImageUrl(report.cleaned_photo) : null);
     }
   }, [report]);
 
@@ -62,7 +71,7 @@ export default function StatusUpdateModal({ isOpen, onClose, report, onSuccess }
       setLoading(true);
       const formData = new FormData();
       formData.append('status', status);
-      if (assignedTo) formData.append('assigned_to', assignedTo);
+      formData.append('assigned_to', assignedTo);
       if (notes.trim()) formData.append('notes', notes.trim());
       if (cleanedPhotoFile) {
         formData.append('cleaned_photo', cleanedPhotoFile);
@@ -110,7 +119,7 @@ export default function StatusUpdateModal({ isOpen, onClose, report, onSuccess }
               Select Lifecycle Stage
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {STATUS_STEPS.map((step) => (
+              {availableSteps.map((step) => (
                 <button
                   type="button"
                   key={step.value}
@@ -128,25 +137,27 @@ export default function StatusUpdateModal({ isOpen, onClose, report, onSuccess }
             </div>
           </div>
 
-          {/* Assign Cleanup Staff */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-              <UserCheck className="w-3.5 h-3.5 text-purple-400" />
-              <span>Assign to Cleanup Staff</span>
-            </label>
-            <select
-              value={assignedTo}
-              onChange={(e) => setAssignedTo(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
-            >
-              <option value="">-- Unassigned (General Municipal Pool) --</option>
-              {staffList.map((st) => (
-                <option key={st.id} value={st.id}>
-                  {st.name} ({st.email})
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Assign Cleanup Staff (Admin Only) */}
+          {!isStaff && (
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                <UserCheck className="w-3.5 h-3.5 text-purple-400" />
+                <span>Assign to Cleanup Staff</span>
+              </label>
+              <select
+                value={assignedTo}
+                onChange={(e) => setAssignedTo(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+              >
+                <option value="">-- Unassigned (General Municipal Pool) --</option>
+                {staffList.map((st) => (
+                  <option key={st.id} value={st.id}>
+                    {st.name} ({st.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Cleaned Photo Upload (If Cleaned) */}
           {(status === 'cleaned' || status === 'closed') && (

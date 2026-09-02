@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+const API_BASE = import.meta.env.VITE_API_URL || `http://${hostname}:5000/api`;
 
 const api = axios.create({
   baseURL: API_BASE,
@@ -34,5 +35,14 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+export function getImageUrl(url) {
+  if (!url) return 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80';
+  if (url.startsWith('/uploads')) {
+    const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+    return `http://${hostname}:5000${url}`;
+  }
+  return url;
+}
 
 export default api;

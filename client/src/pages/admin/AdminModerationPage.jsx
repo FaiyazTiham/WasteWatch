@@ -5,6 +5,7 @@ import {
   Eye, RefreshCw, Layers, Shield
 } from 'lucide-react';
 import { adminService } from '../../api/apiServices';
+import { getImageUrl } from '../../api/client';
 import { useToast } from '../../context/ToastContext';
 
 export default function AdminModerationPage() {
@@ -94,7 +95,7 @@ export default function AdminModerationPage() {
                 <div className="flex items-start gap-4">
                   {flag.report_photo && (
                     <img
-                      src={flag.report_photo}
+                      src={getImageUrl(flag.report_photo)}
                       alt={flag.report_title}
                       className="w-16 h-16 rounded-xl object-cover bg-slate-800 shrink-0 border border-slate-700"
                     />

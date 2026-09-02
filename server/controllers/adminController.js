@@ -173,7 +173,10 @@ exports.getAllUsers = async (req, res) => {
     if (db.isMysqlActive) {
       const [users] = await db.getPool().query(`
         SELECT u.id, u.name, u.email, u.role, u.avatar, u.phone, u.status, u.created_at,
-               (SELECT COUNT(*) FROM reports WHERE user_id = u.id) as reports_count
+               (SELECT COUNT(*) FROM reports WHERE user_id = u.id) as reports_count,
+               (SELECT COUNT(*) FROM reports WHERE assigned_to = u.id) as assigned_reports_count,
+               (SELECT COUNT(*) FROM reports WHERE assigned_to = u.id AND status IN ('assigned', 'in_progress')) as active_assigned_count,
+               (SELECT COUNT(*) FROM reports WHERE assigned_to = u.id AND status IN ('cleaned', 'closed')) as cleaned_assigned_count
         FROM users u
         ORDER BY u.created_at DESC
       `);
@@ -182,8 +185,18 @@ exports.getAllUsers = async (req, res) => {
 
     const users = db.fallbackStore.data.users.map(u => {
       const reportsCount = db.fallbackStore.data.reports.filter(r => Number(r.user_id) === Number(u.id)).length;
+      const assignedReportsCount = db.fallbackStore.data.reports.filter(r => Number(r.assigned_to) === Number(u.id)).length;
+      const activeAssignedCount = db.fallbackStore.data.reports.filter(r => Number(r.assigned_to) === Number(u.id) && ['assigned', 'in_progress'].includes(r.status)).length;
+      const cleanedAssignedCount = db.fallbackStore.data.reports.filter(r => Number(r.assigned_to) === Number(u.id) && ['cleaned', 'closed'].includes(r.status)).length;
+
       const { password_hash, ...safe } = u;
-      return { ...safe, reports_count: reportsCount };
+      return {
+        ...safe,
+        reports_count: reportsCount,
+        assigned_reports_count: assignedReportsCount,
+        active_assigned_count: activeAssignedCount,
+        cleaned_assigned_count: cleanedAssignedCount
+      };
     });
 
     return res.json({ success: true, users });
@@ -246,19 +259,168 @@ exports.toggleUserBan = async (req, res) => {
   }
 };
 
+// 4b. Approve User (for pending staff/admin accounts)
+exports.approveUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (db.isMysqlActive) {
+      const [rows] = await db.getPool().query('SELECT * FROM users WHERE id = ?', [userId]);
+      if (rows.length === 0) return res.status(404).json({ success: false, message: 'User not found' });
+
+      await db.getPool().query('UPDATE users SET status = "active" WHERE id = ?', [userId]);
+
+      // Notify user
+      await db.getPool().query(
+        'INSERT INTO notifications (user_id, title, message, type, link_url, is_read) VALUES (?, ?, ?, "approval", "/profile", FALSE)',
+        [userId, 'Account Approved! 🎉', `Your requested ${rows[0].role} account has been approved by the administrator.`]
+      );
+
+      return res.json({ success: true, message: `User ${rows[0].name} has been approved as ${rows[0].role}.` });
+    }
+
+    const user = db.fallbackStore.data.users.find(u => Number(u.id) === Number(userId));
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    user.status = 'active';
+
+    const newId = db.fallbackStore.getNextId('notifications');
+    db.fallbackStore.data.notifications.unshift({
+      id: newId,
+      user_id: Number(userId),
+      title: 'Account Approved! 🎉',
+      message: `Your requested ${user.role} account has been approved by the administrator.`,
+      type: 'approval',
+      link_url: '/profile',
+      is_read: false,
+      created_at: new Date().toISOString()
+    });
+
+    db.fallbackStore.save();
+
+    return res.json({ success: true, message: `User ${user.name} has been approved as ${user.role}.` });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Failed to approve user', error: err.message });
+  }
+};
+
+// 4c. Reject User Request
+exports.rejectUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (db.isMysqlActive) {
+      const [rows] = await db.getPool().query('SELECT * FROM users WHERE id = ?', [userId]);
+      if (rows.length === 0) return res.status(404).json({ success: false, message: 'User not found' });
+
+      // Demote to standard citizen user or ban
+      await db.getPool().query('UPDATE users SET role = "user", status = "active" WHERE id = ?', [userId]);
+
+      await db.getPool().query(
+        'INSERT INTO notifications (user_id, title, message, type, link_url, is_read) VALUES (?, ?, ?, "system", "/profile", FALSE)',
+        [userId, 'Access Request Update', 'Your request for staff/admin privileges was declined. Your account has been registered as a Citizen user.']
+      );
+
+      return res.json({ success: true, message: `Staff/Admin request for ${rows[0].name} was rejected (account set to standard user).` });
+    }
+
+    const user = db.fallbackStore.data.users.find(u => Number(u.id) === Number(userId));
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    user.role = 'user';
+    user.status = 'active';
+
+    const newId = db.fallbackStore.getNextId('notifications');
+    db.fallbackStore.data.notifications.unshift({
+      id: newId,
+      user_id: Number(userId),
+      title: 'Access Request Update',
+      message: 'Your request for staff/admin privileges was declined. Your account has been registered as a Citizen user.',
+      type: 'system',
+      link_url: '/profile',
+      is_read: false,
+      created_at: new Date().toISOString()
+    });
+
+    db.fallbackStore.save();
+
+    return res.json({ success: true, message: `Staff/Admin request for ${user.name} was rejected (account set to standard user).` });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Failed to reject user request', error: err.message });
+  }
+};
+
+// Delete User Account Permanently
+exports.deleteUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const targetUserId = Number(userId);
+
+    // Prevent admin from deleting self
+    if (Number(req.user.id) === targetUserId) {
+      return res.status(400).json({ success: false, message: 'You cannot delete your active admin account.' });
+    }
+
+    if (db.isMysqlActive) {
+      const [rows] = await db.getPool().query('SELECT * FROM users WHERE id = ?', [targetUserId]);
+      if (rows.length === 0) return res.status(404).json({ success: false, message: 'User account not found.' });
+
+      await db.getPool().query('DELETE FROM users WHERE id = ?', [targetUserId]);
+      return res.json({ success: true, message: `User account "${rows[0].name}" permanently deleted.` });
+    }
+
+    const index = db.fallbackStore.data.users.findIndex(u => Number(u.id) === targetUserId);
+    if (index === -1) return res.status(404).json({ success: false, message: 'User account not found.' });
+
+    const deletedUser = db.fallbackStore.data.users[index];
+    db.fallbackStore.data.users.splice(index, 1);
+    db.fallbackStore.data.reports = db.fallbackStore.data.reports.filter(r => Number(r.user_id) !== targetUserId);
+    db.fallbackStore.data.comments = db.fallbackStore.data.comments.filter(c => Number(c.user_id) !== targetUserId);
+    db.fallbackStore.data.upvotes = db.fallbackStore.data.upvotes.filter(u => Number(u.user_id) !== targetUserId);
+    db.fallbackStore.data.notifications = db.fallbackStore.data.notifications.filter(n => Number(n.user_id) !== targetUserId);
+    db.fallbackStore.save();
+
+    return res.json({ success: true, message: `User account "${deletedUser.name}" permanently deleted.` });
+  } catch (err) {
+    console.error('deleteUser error:', err);
+    return res.status(500).json({ success: false, message: 'Failed to delete user account', error: err.message });
+  }
+};
+
 // 5. Get Available Cleanup Staff List
 exports.getStaffList = async (req, res) => {
   try {
     if (db.isMysqlActive) {
-      const [staff] = await db.getPool().query(
-        "SELECT id, name, email, avatar, phone FROM users WHERE role = 'cleanup_staff' AND status = 'active'"
-      );
+      const [staff] = await db.getPool().query(`
+        SELECT u.id, u.name, u.email, u.avatar, u.phone,
+               (SELECT COUNT(*) FROM reports WHERE assigned_to = u.id) as assigned_reports_count,
+               (SELECT COUNT(*) FROM reports WHERE assigned_to = u.id AND status IN ('assigned', 'in_progress')) as active_assigned_count,
+               (SELECT COUNT(*) FROM reports WHERE assigned_to = u.id AND status IN ('cleaned', 'closed')) as cleaned_assigned_count
+        FROM users u
+        WHERE u.role = 'cleanup_staff' AND u.status = 'active'
+        ORDER BY u.name ASC
+      `);
       return res.json({ success: true, staff });
     }
 
     const staff = db.fallbackStore.data.users
       .filter(u => u.role === 'cleanup_staff' && u.status === 'active')
-      .map(u => ({ id: u.id, name: u.name, email: u.email, avatar: u.avatar, phone: u.phone }));
+      .map(u => {
+        const assignedReportsCount = db.fallbackStore.data.reports.filter(r => Number(r.assigned_to) === Number(u.id)).length;
+        const activeAssignedCount = db.fallbackStore.data.reports.filter(r => Number(r.assigned_to) === Number(u.id) && ['assigned', 'in_progress'].includes(r.status)).length;
+        const cleanedAssignedCount = db.fallbackStore.data.reports.filter(r => Number(r.assigned_to) === Number(u.id) && ['cleaned', 'closed'].includes(r.status)).length;
+
+        return {
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          avatar: u.avatar,
+          phone: u.phone,
+          assigned_reports_count: assignedReportsCount,
+          active_assigned_count: activeAssignedCount,
+          cleaned_assigned_count: cleanedAssignedCount
+        };
+      });
 
     return res.json({ success: true, staff });
   } catch (err) {

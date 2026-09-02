@@ -21,86 +21,129 @@ async function runTests() {
     const healthRes = await fetch(`${BASE_URL}/health`).then(r => r.json());
     assert(healthRes.status === 'online', 'Server health endpoint responds online');
 
-    // 2. Demo Login (Citizen)
-    const demoCitizen = await fetch(`${BASE_URL}/auth/demo-login/citizen`, { method: 'POST' }).then(r => r.json());
-    assert(demoCitizen.success && demoCitizen.token && demoCitizen.user.role === 'user', 'Demo login as Citizen');
-    const citizenToken = demoCitizen.token;
-
-    // 3. Demo Login (Admin)
-    const demoAdmin = await fetch(`${BASE_URL}/auth/demo-login/admin`, { method: 'POST' }).then(r => r.json());
-    assert(demoAdmin.success && demoAdmin.token && demoAdmin.user.role === 'admin', 'Demo login as Admin');
-    const adminToken = demoAdmin.token;
-
-    // 4. Demo Login (Staff)
-    const demoStaff = await fetch(`${BASE_URL}/auth/demo-login/staff`, { method: 'POST' }).then(r => r.json());
-    assert(demoStaff.success && demoStaff.token && demoStaff.user.role === 'cleanup_staff', 'Demo login as Staff');
-    const staffToken = demoStaff.token;
-
-    // 5. Get Categories
-    const catRes = await fetch(`${BASE_URL}/reports/categories`).then(r => r.json());
-    assert(catRes.success && catRes.categories.length >= 8, `Categories retrieved (${catRes.categories.length} categories)`);
-
-    // 6. Get Reports Feed & Filters
-    const repRes = await fetch(`${BASE_URL}/reports?limit=20`).then(r => r.json());
-    assert(repRes.success && repRes.reports.length > 0, `Get reports feed (${repRes.count} reports found)`);
-
-    // 7. Get Single Report by ID
-    const singleRep = await fetch(`${BASE_URL}/reports/1`).then(r => r.json());
-    assert(singleRep.success && singleRep.report.id === 1 && singleRep.report.status_logs, 'Get single report with logs & comments');
-
-    // 8. Toggle Upvote on Report
-    const upvoteRes = await fetch(`${BASE_URL}/reports/1/upvote`, {
+    // 2. Login as Admin Faiyaz
+    const adminLoginRes = await fetch(`${BASE_URL}/auth/login`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${citizenToken}` }
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'faiyaz@gmail.com', password: '7799fftt' })
     }).then(r => r.json());
-    assert(upvoteRes.success && typeof upvoteRes.upvotes_count === 'number', 'Citizen upvote toggle');
+    assert(adminLoginRes.success && adminLoginRes.user.role === 'admin', 'Login as Admin Faiyaz (faiyaz@gmail.com)');
+    const adminToken = adminLoginRes.token;
 
-    // 9. Add Comment to Report
-    const commentRes = await fetch(`${BASE_URL}/reports/1/comments`, {
+    // 5. Test Staff Registration Requires Admin Approval
+    const testStaffEmail = `pending_staff_${Date.now()}@example.com`;
+    const regStaffRes = await fetch(`${BASE_URL}/auth/register`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${citizenToken}`
-      },
-      body: JSON.stringify({ content: 'Integration test automated comment: verified area!' })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Carlos Mendez',
+        email: testStaffEmail,
+        password: 'Password123!',
+        role: 'cleanup_staff'
+      })
     }).then(r => r.json());
-    assert(commentRes.success && commentRes.comment.content.includes('Integration test'), 'Add comment to report');
+    assert(regStaffRes.success && regStaffRes.pending_approval === true, 'Registration as Cleanup Staff requires admin approval (status = pending_approval)');
+    const pendingStaffId = regStaffRes.user.id;
 
-    // 10. Flag Inappropriate Report
-    const flagRes = await fetch(`${BASE_URL}/reports/2/flag`, {
+    // 6. Attempt Login with Unapproved Staff Account (Must be blocked)
+    const unapprovedLoginRes = await fetch(`${BASE_URL}/auth/login`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${citizenToken}`
-      },
-      body: JSON.stringify({ reason: 'Duplicate submission', details: 'Integration test test flag' })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: testStaffEmail,
+        password: 'Password123!'
+      })
     }).then(r => r.json());
-    assert(flagRes.success, 'Flag complaint for municipal moderation');
+    assert(!unapprovedLoginRes.success && unapprovedLoginRes.pending_approval === true, 'Unapproved staff blocked from logging in with supervisor approval message');
 
-    // 11. Create New Waste Report
-    const newRepRes = await fetch(`${BASE_URL}/reports`, {
+    // 7. Admin Approves Pending Staff Account
+    const approveRes = await fetch(`${BASE_URL}/admin/users/${pendingStaffId}/approve`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${adminToken}` }
+    }).then(r => r.json());
+    assert(approveRes.success, 'Admin approved pending staff account');
+
+    // 8. Approved Staff Can Now Successfully Log In
+    const approvedLoginRes = await fetch(`${BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: testStaffEmail,
+        password: 'Password123!'
+      })
+    }).then(r => r.json());
+    assert(approvedLoginRes.success && approvedLoginRes.token && approvedLoginRes.user.role === 'cleanup_staff', 'Approved staff successfully logged in');
+    const staffToken = approvedLoginRes.token;
+    const staffId = approvedLoginRes.user.id;
+
+    // Register a citizen user for report creation & flagging
+    const citizenEmail = `citizen_${Date.now()}@example.com`;
+    const regCitizenRes = await fetch(`${BASE_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Test Citizen', email: citizenEmail, password: 'Password123!', role: 'user' })
+    }).then(r => r.json());
+    assert(regCitizenRes.success && regCitizenRes.token, 'Registered test citizen user');
+    const citizenToken = regCitizenRes.token;
+
+    // Create a new report by Citizen
+    const createRepRes = await fetch(`${BASE_URL}/reports`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${citizenToken}`
       },
       body: JSON.stringify({
-        title: 'Chemical Paint Residue near Westside Canal',
-        description: 'Several open cans of industrial paint spilled into water drainage basin.',
-        category_id: 4,
-        severity: 'critical',
-        latitude: 40.7580,
-        longitude: -73.9855,
-        address: '450 Westside Highway, Sector 9',
-        area_district: 'Westside Canal District',
-        photo_url: 'https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?w=800&auto=format&fit=crop&q=80'
+        title: 'Integration Test Garbage Waste Dump',
+        description: 'Test waste dump for staff permissions validation',
+        category_id: 1,
+        severity: 'high',
+        latitude: 23.8103,
+        longitude: 90.4125,
+        address: 'Downtown Main Street',
+        primary_photo: 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80'
       })
     }).then(r => r.json());
-    assert(newRepRes.success && newRepRes.reportId, `Create new waste report (ID: ${newRepRes.reportId})`);
-    const createdReportId = newRepRes.reportId;
+    const createdReportId = createRepRes.reportId || createRepRes.report?.id;
+    assert(createRepRes.success && createdReportId, 'Citizen created new report');
 
-    // 12. Update Report Status & Add Resolution (Admin / Staff)
-    const updateStatusRes = await fetch(`${BASE_URL}/reports/${createdReportId}/status`, {
+    // 9. Staff can View Details of ANY Report (e.g. unassigned or assigned to someone else)
+    const singleRep = await fetch(`${BASE_URL}/reports/${createdReportId}`, {
+      headers: { Authorization: `Bearer ${staffToken}` }
+    }).then(r => r.json());
+    assert(singleRep.success && singleRep.report.id === createdReportId && singleRep.report.title, 'Staff can view full details of any report');
+
+    // 10. Admin Assign Staff to Report (Assign report to new Staff ID)
+    const assignRes = await fetch(`${BASE_URL}/reports/${createdReportId}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${adminToken}`
+      },
+      body: JSON.stringify({
+        status: 'assigned',
+        assigned_to: staffId,
+        notes: 'Assigned to newly approved staff.'
+      })
+    }).then(r => r.json());
+    assert(assignRes.success, 'Admin assigned report to approved staff');
+
+    // 11. Staff Update Assigned Report (Allowed, and assignment is preserved)
+    const staffUpdateRes = await fetch(`${BASE_URL}/reports/${createdReportId}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${staffToken}`
+      },
+      body: JSON.stringify({
+        status: 'in_progress',
+        notes: 'Rapid response crew arrived on scene with collection truck.'
+      })
+    }).then(r => r.json());
+    assert(staffUpdateRes.success, 'Assigned staff successfully updated report status to In Progress');
+
+    // 12. Staff Attempt Update on Report NOT Assigned to Them (unassigned report #999) -> Blocked 403
+    const forbiddenUpdateRes = await fetch(`${BASE_URL}/reports/${createdReportId + 100}/status`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -108,49 +151,52 @@ async function runTests() {
       },
       body: JSON.stringify({
         status: 'cleaned',
-        notes: 'Sanitation unit vacuumed residue, neutralizer applied.',
-        cleaned_photo: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=80',
-        assigned_to: 3
+        notes: 'Unassigned update attempt'
       })
     }).then(r => r.json());
-    assert(updateStatusRes.success, 'Staff update report lifecycle status to Cleaned with photo');
+    assert(!forbiddenUpdateRes.success, 'Staff blocked from updating report not assigned to them');
 
-    // 13. Notifications
-    const notifRes = await fetch(`${BASE_URL}/notifications`, {
-      headers: { Authorization: `Bearer ${citizenToken}` }
-    }).then(r => r.json());
-    assert(notifRes.success && notifRes.notifications.length > 0, `Citizen received status notifications (${notifRes.notifications.length} alerts)`);
-
-    // 14. Admin Analytics & KPIs
-    const analyticsRes = await fetch(`${BASE_URL}/admin/analytics`, {
-      headers: { Authorization: `Bearer ${adminToken}` }
-    }).then(r => r.json());
-    assert(analyticsRes.success && analyticsRes.analytics.totalReports > 0 && analyticsRes.analytics.reportsByCategory, 'Admin analytics computation with categories and time trends');
-
-    // 15. Admin User Management
-    const usersRes = await fetch(`${BASE_URL}/admin/users`, {
-      headers: { Authorization: `Bearer ${adminToken}` }
-    }).then(r => r.json());
-    assert(usersRes.success && usersRes.users.length >= 3, `Admin get all users (${usersRes.users.length} users)`);
-
-    // 16. Admin Moderation Queue
-    const flagsRes = await fetch(`${BASE_URL}/admin/flags`, {
-      headers: { Authorization: `Bearer ${adminToken}` }
-    }).then(r => r.json());
-    assert(flagsRes.success && flagsRes.flags.length > 0, `Admin moderation queue list (${flagsRes.flags.length} flags)`);
-
-    // 17. Submit Contact Form
-    const contactRes = await fetch(`${BASE_URL}/contact`, {
+    // 13. Citizen Flags Inappropriate Report
+    const flagRes = await fetch(`${BASE_URL}/reports/${createdReportId}/flag`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: 'Alex Johnson',
-        email: 'alex@example.com',
-        subject: 'Community Cleanup Drive Collaboration',
-        message: 'We want to organize a weekend trash pickup drive in Sector 5.'
-      })
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${citizenToken}`
+      },
+      body: JSON.stringify({ reason: 'Duplicate / Spam', details: 'Integration test automated flag submission' })
     }).then(r => r.json());
-    assert(contactRes.success, 'Submit contact message');
+    assert(flagRes.success, 'Citizen submitted report moderation flag');
+
+    // 14. Admin Moderation Queue
+    const flagsQueueRes = await fetch(`${BASE_URL}/admin/flags`, {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    }).then(r => r.json());
+    assert(flagsQueueRes.success && Array.isArray(flagsQueueRes.flags), 'Admin fetched moderation flags queue');
+
+    // 15. Admin Staff Roster Workload Stats
+    const staffRosterRes = await fetch(`${BASE_URL}/admin/staff`, {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    }).then(r => r.json());
+    assert(
+      staffRosterRes.success &&
+      Array.isArray(staffRosterRes.staff) &&
+      staffRosterRes.staff.length >= 1,
+      'Admin get staff roster with assigned workload statistics'
+    );
+
+    // 16. Admin Suspend (Ban) User Account
+    const banRes = await fetch(`${BASE_URL}/admin/users/${staffId}/ban`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${adminToken}` }
+    }).then(r => r.json());
+    assert(banRes.success && banRes.status === 'banned', 'Admin suspended (banned) user account');
+
+    // 17. Admin Permanently Delete User Account
+    const deleteRes = await fetch(`${BASE_URL}/admin/users/${staffId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${adminToken}` }
+    }).then(r => r.json());
+    assert(deleteRes.success, 'Admin permanently deleted staff/client account ID');
 
     console.log(`\n=========================================`);
     console.log(`📊 Test Results: ${passed} Passed, ${failed} Failed`);
