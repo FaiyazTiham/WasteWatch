@@ -72,7 +72,7 @@ class FallbackDB {
 
 const fallbackStore = new FallbackDB();
 
-// Quick TCP port check to avoid hanging if MySQL is not running
+// Quick TCP port check to avoid hanging if local MySQL is not running
 function isPortOpen(host, port, timeout = 400) {
   return new Promise((resolve) => {
     const socket = new net.Socket();
@@ -106,13 +106,33 @@ async function initDB() {
   const database = process.env.DB_NAME || 'wastewatch_db';
   const port = Number(process.env.DB_PORT) || 3306;
 
-  const portAvailable = await isPortOpen(host, port, 400);
+  const isLocal = host === 'localhost' || host === '127.0.0.1';
+  // Allow cloud databases up to 4000ms for network latency; local check gets 500ms
+  const checkTimeout = isLocal ? 500 : 4000;
+  const isCloudHost = !isLocal;
+  const sslOptions = (process.env.DB_SSL === 'true' || process.env.DB_SSL === '1' || isCloudHost)
+    ? { rejectUnauthorized: false }
+    : undefined;
+
+  const portAvailable = await isPortOpen(host, port, checkTimeout);
 
   if (portAvailable) {
     try {
-      const connection = await mysql.createConnection({ host, user, password, port });
-      await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
-      await connection.end();
+      // For managed cloud MySQL, CREATE DATABASE may fail if privileges are restricted; that is OK
+      try {
+        const connection = await mysql.createConnection({
+          host,
+          user,
+          password,
+          port,
+          ssl: sslOptions,
+          connectTimeout: checkTimeout
+        });
+        await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
+        await connection.end();
+      } catch (cdErr) {
+        // Cloud providers usually don't grant global CREATE DATABASE privileges to app users; proceed safely
+      }
 
       dbPool = mysql.createPool({
         host,
@@ -123,15 +143,21 @@ async function initDB() {
         waitForConnections: true,
         connectionLimit: 10,
         queueLimit: 0,
-        decimalNumbers: true
+        decimalNumbers: true,
+        ssl: sslOptions,
+        connectTimeout: checkTimeout
       });
 
-      isMysqlActive = true;
-      console.log(`[Database] Connected to MySQL database: ${database} on ${host}:${port}`);
-      await createMysqlTables();
-      return true;
+      // Quick ping to confirm pool readiness
+      const [pingResult] = await dbPool.query('SELECT 1 as alive');
+      if (pingResult) {
+        isMysqlActive = true;
+        console.log(`[Database] Connected to MySQL database: ${database} on ${host}:${port}`);
+        await createMysqlTables();
+        return true;
+      }
     } catch (err) {
-      console.log(`[Database] MySQL authentication error (${err.message}). Using local persistent database.`);
+      console.log(`[Database] MySQL connection error (${err.message}). Using local persistent database.`);
       isMysqlActive = false;
       return false;
     }

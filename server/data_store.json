@@ -6,11 +6,90 @@
       "email": "faiyaz@gmail.com",
       "password_hash": "$2b$10$7mkhcWZlKLMxaEe1QRKkveCseIAywHNfGvSdd9FS1CuU9k/oPsO5S",
       "role": "admin",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+      "avatar": "/uploads/waste-1788366942251-271923026.jpg",
       "bio": "System Administrator & WasteWatch Lead Supervisor",
       "phone": "+1 (555) 019-9999",
       "status": "active",
-      "created_at": "2026-09-02T16:33:51.082Z"
+      "created_at": "2026-09-02T16:33:52.000Z",
+      "updated_at": "2026-09-02T16:35:42.000Z"
+    },
+    {
+      "id": 2,
+      "name": "Ridia",
+      "email": "ffcallbackfriend1@gmail.com",
+      "password_hash": "$2b$10$yNGrfoR11itIPP90Wlzc0e/5UWMu6YUeVmGUFutiWWHgjmOBH3xx6",
+      "role": "user",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Ridia",
+      "bio": null,
+      "phone": null,
+      "status": "active",
+      "created_at": "2026-09-02T16:39:16.000Z",
+      "updated_at": "2026-09-02T16:39:16.000Z"
+    },
+    {
+      "id": 3,
+      "name": "Rifat",
+      "email": "ffcallbackfriend2@gmail.com",
+      "password_hash": "$2b$10$/eL9485huw3.5L/Z3bL25./Y.rv0a.nx5PYUhIoz4Q3hzoAUW4sFe",
+      "role": "cleanup_staff",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Rifat",
+      "bio": null,
+      "phone": null,
+      "status": "active",
+      "created_at": "2026-09-02T16:43:20.000Z",
+      "updated_at": "2026-09-02T16:55:16.000Z"
+    },
+    {
+      "id": 4,
+      "name": "Ra3",
+      "email": "ffcallbackfriend3@gmail.com",
+      "password_hash": "$2b$10$d4l1QwTPi29iAgZKBTSZKOMCT.QVeGLU45mUQ0ZvzW4IjDbrR05DO",
+      "role": "admin",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Ra3",
+      "bio": null,
+      "phone": null,
+      "status": "active",
+      "created_at": "2026-09-02T16:45:38.000Z",
+      "updated_at": "2026-09-02T16:45:47.000Z"
+    },
+    {
+      "id": 5,
+      "name": "Dur E Fishan",
+      "email": "bounerd@gmail.com",
+      "password_hash": "$2b$10$4MXWzNNkY0JaVrZKzyo/YuUXl6Y5tVaEjGdODKOc6OIHj8MxO91We",
+      "role": "user",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Dur%20E%20Fishan",
+      "bio": null,
+      "phone": null,
+      "status": "active",
+      "created_at": "2026-09-02T17:00:23.000Z",
+      "updated_at": "2026-09-02T17:00:23.000Z"
+    },
+    {
+      "id": 6,
+      "name": "Sunny",
+      "email": "ffcallbackfriend4@gmail.com",
+      "password_hash": "$2b$10$g8PlnqbRdrOD5q.tr2Q2cOzMgS4vfpyKRnVjfRMDSv9Quf/X611bS",
+      "role": "user",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Sunny",
+      "bio": null,
+      "phone": null,
+      "status": "active",
+      "created_at": "2026-09-02T17:02:09.000Z",
+      "updated_at": "2026-09-02T17:02:09.000Z"
+    },
+    {
+      "id": 7,
+      "name": "Faiyo",
+      "email": "kunerd@gmail.com",
+      "password_hash": "$2b$10$SnB1p1iauCk13MBUIn8bGOZKXIoHqxcjdz8x7HXo2mTud1ccBp65W",
+      "role": "cleanup_staff",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Faiyo",
+      "bio": null,
+      "phone": null,
+      "status": "active",
+      "created_at": "2026-09-02T17:02:47.000Z",
+      "updated_at": "2026-09-02T17:05:42.000Z"
     }
   ],
   "categories": [
@@ -20,7 +99,9 @@
       "slug": "household-waste",
       "description": "Domestic trash, organic waste, kitchen leftovers & bags",
       "icon": "Trash2",
-      "color": "#10B981"
+      "color": "#10B981",
+      "is_active": 1,
+      "created_at": "2026-09-02T10:38:28.000Z"
     },
     {
       "id": 2,
@@ -28,7 +109,9 @@
       "slug": "plastic",
       "description": "Bottles, single-use bags, packaging materials, styrofoam",
       "icon": "ShoppingBag",
-      "color": "#3B82F6"
+      "color": "#3B82F6",
+      "is_active": 1,
+      "created_at": "2026-09-02T10:38:28.000Z"
     },
     {
       "id": 3,
@@ -36,7 +119,9 @@
       "slug": "construction-waste",
       "description": "Bricks, concrete rubble, wood tiles, drywall remnants",
       "icon": "HardHat",
-      "color": "#F59E0B"
+      "color": "#F59E0B",
+      "is_active": 1,
+      "created_at": "2026-09-02T10:38:28.000Z"
     },
     {
       "id": 4,
@@ -44,7 +129,9 @@
       "slug": "industrial-waste",
       "description": "Chemical drums, metal scraps, rubber tires, toxic containers",
       "icon": "Factory",
-      "color": "#EF4444"
+      "color": "#EF4444",
+      "is_active": 1,
+      "created_at": "2026-09-02T10:38:28.000Z"
     },
     {
       "id": 5,
@@ -52,7 +139,9 @@
       "slug": "drain-sewer",
       "description": "Clogged storm drains, overflowing sewers, grease runoff",
       "icon": "Droplets",
-      "color": "#8B5CF6"
+      "color": "#8B5CF6",
+      "is_active": 1,
+      "created_at": "2026-09-02T10:38:28.000Z"
     },
     {
       "id": 6,
@@ -60,7 +149,9 @@
       "slug": "roadside-garbage",
       "description": "Littered sidewalks, median dumpings, highway roadside piles",
       "icon": "AlertTriangle",
-      "color": "#EC4899"
+      "color": "#EC4899",
+      "is_active": 1,
+      "created_at": "2026-09-02T10:38:28.000Z"
     },
     {
       "id": 7,
@@ -68,7 +159,9 @@
       "slug": "water-pollution",
       "description": "Contaminated lakes, floating river trash, coastal canal plastics",
       "icon": "Waves",
-      "color": "#06B6D4"
+      "color": "#06B6D4",
+      "is_active": 1,
+      "created_at": "2026-09-02T10:38:28.000Z"
     },
     {
       "id": 8,
@@ -76,15 +169,602 @@
       "slug": "other",
       "description": "Electronic waste, broken glass, batteries, medical materials",
       "icon": "HelpCircle",
-      "color": "#6B7280"
+      "color": "#6B7280",
+      "is_active": 1,
+      "created_at": "2026-09-02T10:38:28.000Z"
     }
   ],
-  "reports": [],
+  "reports": [
+    {
+      "id": 2,
+      "user_id": 2,
+      "title": "Plastic Waste",
+      "description": "Roadside wastage are causing dailylife problem & bad smell.",
+      "category_id": 2,
+      "severity": "low",
+      "status": "reported",
+      "latitude": "22.87079640",
+      "longitude": "91.09429147",
+      "address": "Noakhali, Noakhali Sadar Upazila, Noakhali District, Chattogram Division, Bangladesh",
+      "area_district": "Noakhali",
+      "primary_photo": "https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80",
+      "cleaned_photo": null,
+      "assigned_to": null,
+      "verified_at": null,
+      "cleaned_at": null,
+      "closed_at": null,
+      "views_count": 8,
+      "created_at": "2026-09-02T16:51:36.000Z",
+      "updated_at": "2026-09-02T16:52:52.000Z"
+    },
+    {
+      "id": 3,
+      "user_id": 2,
+      "title": "Filth",
+      "description": "Filths are causing daily life problem",
+      "category_id": 2,
+      "severity": "low",
+      "status": "verified",
+      "latitude": "22.87083575",
+      "longitude": "91.09412655",
+      "address": "Noakhali, Noakhali Sadar Upazila, Noakhali District, Chattogram Division, Bangladesh",
+      "area_district": "Noakhali",
+      "primary_photo": "/uploads/waste-1788368031084-965003408.png",
+      "cleaned_photo": null,
+      "assigned_to": null,
+      "verified_at": "2026-09-02T17:11:25.000Z",
+      "cleaned_at": null,
+      "closed_at": null,
+      "views_count": 8,
+      "created_at": "2026-09-02T16:53:52.000Z",
+      "updated_at": "2026-09-02T17:11:25.000Z"
+    },
+    {
+      "id": 4,
+      "user_id": 2,
+      "title": "Drainage Problem",
+      "description": "Drain water overflowing towards main street.",
+      "category_id": 5,
+      "severity": "high",
+      "status": "assigned",
+      "latitude": "22.87080305",
+      "longitude": "91.09597288",
+      "address": "Noakhali, Noakhali Sadar Upazila, Noakhali District, Chattogram Division, Bangladesh",
+      "area_district": "Noakhali",
+      "primary_photo": "/uploads/waste-1788368287730-228631042.jpg",
+      "cleaned_photo": null,
+      "assigned_to": 7,
+      "verified_at": null,
+      "cleaned_at": null,
+      "closed_at": null,
+      "views_count": 6,
+      "created_at": "2026-09-02T16:58:09.000Z",
+      "updated_at": "2026-09-02T17:08:41.000Z"
+    },
+    {
+      "id": 5,
+      "user_id": 5,
+      "title": "Garbage",
+      "description": "Odor",
+      "category_id": 2,
+      "severity": "medium",
+      "status": "assigned",
+      "latitude": "22.83884499",
+      "longitude": "91.18652358",
+      "address": "R148, Kabirhat, Noakhali Sadar Upazila, Noakhali District, Chattogram Division, Bangladesh",
+      "area_district": "Noakhali Sadar Upazila",
+      "primary_photo": "/uploads/waste-1788368455777-145462621.jpg",
+      "cleaned_photo": null,
+      "assigned_to": 7,
+      "verified_at": null,
+      "cleaned_at": null,
+      "closed_at": null,
+      "views_count": 4,
+      "created_at": "2026-09-02T17:00:56.000Z",
+      "updated_at": "2026-09-02T17:06:00.000Z"
+    },
+    {
+      "id": 6,
+      "user_id": 5,
+      "title": "Garbage",
+      "description": "Odor",
+      "category_id": 2,
+      "severity": "medium",
+      "status": "reported",
+      "latitude": "23.82984325",
+      "longitude": "90.24627687",
+      "address": "Singair Subdistrict, Manikganj District, Dhaka Division, 1347, Bangladesh",
+      "area_district": "Singair Subdistrict",
+      "primary_photo": "/uploads/waste-1788368505557-100738648.jpg",
+      "cleaned_photo": null,
+      "assigned_to": null,
+      "verified_at": null,
+      "cleaned_at": null,
+      "closed_at": null,
+      "views_count": 8,
+      "created_at": "2026-09-02T17:01:45.000Z",
+      "updated_at": "2026-09-02T17:10:27.000Z"
+    },
+    {
+      "id": 7,
+      "user_id": 7,
+      "title": "Garbage",
+      "description": "Potential hazard",
+      "category_id": 2,
+      "severity": "high",
+      "status": "cleaned",
+      "latitude": "24.73394233",
+      "longitude": "89.53857447",
+      "address": "Dhunat Upazila, Bogura District, Rajshahi Division, Bangladesh",
+      "area_district": "Dhunat Upazila",
+      "primary_photo": "/uploads/waste-1788368618239-18976238.jpg",
+      "cleaned_photo": "/uploads/waste-1788369280867-151135231.jpg",
+      "assigned_to": 3,
+      "verified_at": "2026-09-02T17:04:43.000Z",
+      "cleaned_at": "2026-09-02T17:12:56.000Z",
+      "closed_at": null,
+      "views_count": 14,
+      "created_at": "2026-09-02T17:03:38.000Z",
+      "updated_at": "2026-09-02T17:18:31.000Z"
+    }
+  ],
   "report_photos": [],
-  "report_status_logs": [],
+  "report_status_logs": [
+    {
+      "id": 1,
+      "report_id": 1,
+      "changed_by_user_id": 2,
+      "from_status": null,
+      "to_status": "reported",
+      "notes": "Citizen complaint submitted.",
+      "photo_url": null,
+      "created_at": "2026-09-02T16:42:41.000Z"
+    },
+    {
+      "id": 2,
+      "report_id": 1,
+      "changed_by_user_id": 1,
+      "from_status": "reported",
+      "to_status": "in_progress",
+      "notes": "Status updated to in_progress",
+      "photo_url": null,
+      "created_at": "2026-09-02T16:44:51.000Z"
+    },
+    {
+      "id": 3,
+      "report_id": 1,
+      "changed_by_user_id": 4,
+      "from_status": "in_progress",
+      "to_status": "assigned",
+      "notes": "Status updated to assigned",
+      "photo_url": null,
+      "created_at": "2026-09-02T16:46:39.000Z"
+    },
+    {
+      "id": 4,
+      "report_id": 2,
+      "changed_by_user_id": 2,
+      "from_status": null,
+      "to_status": "reported",
+      "notes": "Citizen complaint submitted.",
+      "photo_url": null,
+      "created_at": "2026-09-02T16:51:36.000Z"
+    },
+    {
+      "id": 5,
+      "report_id": 3,
+      "changed_by_user_id": 2,
+      "from_status": null,
+      "to_status": "reported",
+      "notes": "Citizen complaint submitted.",
+      "photo_url": null,
+      "created_at": "2026-09-02T16:53:52.000Z"
+    },
+    {
+      "id": 6,
+      "report_id": 4,
+      "changed_by_user_id": 2,
+      "from_status": null,
+      "to_status": "reported",
+      "notes": "Citizen complaint submitted.",
+      "photo_url": null,
+      "created_at": "2026-09-02T16:58:09.000Z"
+    },
+    {
+      "id": 7,
+      "report_id": 5,
+      "changed_by_user_id": 5,
+      "from_status": null,
+      "to_status": "reported",
+      "notes": "Citizen complaint submitted.",
+      "photo_url": null,
+      "created_at": "2026-09-02T17:00:56.000Z"
+    },
+    {
+      "id": 8,
+      "report_id": 6,
+      "changed_by_user_id": 5,
+      "from_status": null,
+      "to_status": "reported",
+      "notes": "Citizen complaint submitted.",
+      "photo_url": null,
+      "created_at": "2026-09-02T17:01:45.000Z"
+    },
+    {
+      "id": 9,
+      "report_id": 4,
+      "changed_by_user_id": 1,
+      "from_status": "reported",
+      "to_status": "reported",
+      "notes": "Status updated to reported",
+      "photo_url": null,
+      "created_at": "2026-09-02T17:03:36.000Z"
+    },
+    {
+      "id": 10,
+      "report_id": 7,
+      "changed_by_user_id": 7,
+      "from_status": null,
+      "to_status": "reported",
+      "notes": "Citizen complaint submitted.",
+      "photo_url": null,
+      "created_at": "2026-09-02T17:03:38.000Z"
+    },
+    {
+      "id": 11,
+      "report_id": 4,
+      "changed_by_user_id": 1,
+      "from_status": "reported",
+      "to_status": "in_progress",
+      "notes": "Status updated to in_progress",
+      "photo_url": null,
+      "created_at": "2026-09-02T17:03:41.000Z"
+    },
+    {
+      "id": 12,
+      "report_id": 7,
+      "changed_by_user_id": 1,
+      "from_status": "reported",
+      "to_status": "verified",
+      "notes": "Status updated to verified",
+      "photo_url": null,
+      "created_at": "2026-09-02T17:04:43.000Z"
+    },
+    {
+      "id": 13,
+      "report_id": 7,
+      "changed_by_user_id": 1,
+      "from_status": "verified",
+      "to_status": "verified",
+      "notes": "Status updated to verified",
+      "photo_url": null,
+      "created_at": "2026-09-02T17:05:01.000Z"
+    },
+    {
+      "id": 14,
+      "report_id": 5,
+      "changed_by_user_id": 1,
+      "from_status": "reported",
+      "to_status": "assigned",
+      "notes": "Status updated to assigned",
+      "photo_url": null,
+      "created_at": "2026-09-02T17:06:00.000Z"
+    },
+    {
+      "id": 15,
+      "report_id": 4,
+      "changed_by_user_id": 1,
+      "from_status": "in_progress",
+      "to_status": "assigned",
+      "notes": "Status updated to assigned",
+      "photo_url": null,
+      "created_at": "2026-09-02T17:08:41.000Z"
+    },
+    {
+      "id": 16,
+      "report_id": 3,
+      "changed_by_user_id": 1,
+      "from_status": "reported",
+      "to_status": "verified",
+      "notes": "Status updated to verified",
+      "photo_url": null,
+      "created_at": "2026-09-02T17:11:25.000Z"
+    },
+    {
+      "id": 17,
+      "report_id": 7,
+      "changed_by_user_id": 3,
+      "from_status": "verified",
+      "to_status": "cleaned",
+      "notes": "Status updated to cleaned",
+      "photo_url": "/uploads/waste-1788369168423-93658691.jpg",
+      "created_at": "2026-09-02T17:12:56.000Z"
+    },
+    {
+      "id": 18,
+      "report_id": 7,
+      "changed_by_user_id": 3,
+      "from_status": "cleaned",
+      "to_status": "cleaned",
+      "notes": "Status updated to cleaned",
+      "photo_url": "/uploads/waste-1788369280867-151135231.jpg",
+      "created_at": "2026-09-02T17:14:41.000Z"
+    }
+  ],
   "upvotes": [],
   "comments": [],
   "flags": [],
-  "notifications": [],
+  "notifications": [
+    {
+      "id": 1,
+      "user_id": 2,
+      "title": "Report Submitted! 📋",
+      "message": "Your complaint \"Drainage Problem...\" has been logged for municipal review.",
+      "type": "status_change",
+      "link_url": "/reports/1",
+      "is_read": 0,
+      "created_at": "2026-09-02T16:42:42.000Z"
+    },
+    {
+      "id": 2,
+      "user_id": 1,
+      "title": "New Access Approval Request 🛡️",
+      "message": "Rifat (ffcallbackfriend2@gmail.com) has registered as Cleanup Staff and is waiting for your approval.",
+      "type": "approval_request",
+      "link_url": "/admin/users",
+      "is_read": 1,
+      "created_at": "2026-09-02T16:43:20.000Z"
+    },
+    {
+      "id": 3,
+      "user_id": 3,
+      "title": "Account Approved! 🎉",
+      "message": "Your requested cleanup_staff account has been approved by the administrator.",
+      "type": "approval",
+      "link_url": "/profile",
+      "is_read": 0,
+      "created_at": "2026-09-02T16:44:24.000Z"
+    },
+    {
+      "id": 4,
+      "user_id": 3,
+      "title": "New Cleanup Assignment 🧹",
+      "message": "You have been assigned to handle report #1: \"Drainage Problem...\".",
+      "type": "assignment",
+      "link_url": "/reports/1",
+      "is_read": 0,
+      "created_at": "2026-09-02T16:44:51.000Z"
+    },
+    {
+      "id": 5,
+      "user_id": 2,
+      "title": "Status Update: IN_PROGRESS",
+      "message": "Your report \"Drainage Problem...\" moved to status: in_progress.",
+      "type": "status_change",
+      "link_url": "/reports/1",
+      "is_read": 0,
+      "created_at": "2026-09-02T16:44:51.000Z"
+    },
+    {
+      "id": 6,
+      "user_id": 1,
+      "title": "New Access Approval Request 🛡️",
+      "message": "Ra3 (ffcallbackfriend3@gmail.com) has registered as Administrator and is waiting for your approval.",
+      "type": "approval_request",
+      "link_url": "/admin/users",
+      "is_read": 1,
+      "created_at": "2026-09-02T16:45:38.000Z"
+    },
+    {
+      "id": 7,
+      "user_id": 4,
+      "title": "Account Approved! 🎉",
+      "message": "Your requested admin account has been approved by the administrator.",
+      "type": "approval",
+      "link_url": "/profile",
+      "is_read": 0,
+      "created_at": "2026-09-02T16:45:47.000Z"
+    },
+    {
+      "id": 8,
+      "user_id": 2,
+      "title": "Status Update: ASSIGNED",
+      "message": "Your report \"Drainage Problem...\" moved to status: assigned.",
+      "type": "status_change",
+      "link_url": "/reports/1",
+      "is_read": 0,
+      "created_at": "2026-09-02T16:46:39.000Z"
+    },
+    {
+      "id": 9,
+      "user_id": 2,
+      "title": "Report Submitted! 📋",
+      "message": "Your complaint \"Plastic Waste...\" has been logged for municipal review.",
+      "type": "status_change",
+      "link_url": "/reports/2",
+      "is_read": 0,
+      "created_at": "2026-09-02T16:51:36.000Z"
+    },
+    {
+      "id": 10,
+      "user_id": 2,
+      "title": "Report Submitted! 📋",
+      "message": "Your complaint \"Filth...\" has been logged for municipal review.",
+      "type": "status_change",
+      "link_url": "/reports/3",
+      "is_read": 0,
+      "created_at": "2026-09-02T16:53:52.000Z"
+    },
+    {
+      "id": 11,
+      "user_id": 2,
+      "title": "Report Submitted! 📋",
+      "message": "Your complaint \"Drainage Problem...\" has been logged for municipal review.",
+      "type": "status_change",
+      "link_url": "/reports/4",
+      "is_read": 0,
+      "created_at": "2026-09-02T16:58:09.000Z"
+    },
+    {
+      "id": 12,
+      "user_id": 5,
+      "title": "Report Submitted! 📋",
+      "message": "Your complaint \"Garbage...\" has been logged for municipal review.",
+      "type": "status_change",
+      "link_url": "/reports/5",
+      "is_read": 0,
+      "created_at": "2026-09-02T17:00:56.000Z"
+    },
+    {
+      "id": 13,
+      "user_id": 5,
+      "title": "Report Submitted! 📋",
+      "message": "Your complaint \"Garbage...\" has been logged for municipal review.",
+      "type": "status_change",
+      "link_url": "/reports/6",
+      "is_read": 0,
+      "created_at": "2026-09-02T17:01:45.000Z"
+    },
+    {
+      "id": 14,
+      "user_id": 3,
+      "title": "New Cleanup Assignment 🧹",
+      "message": "You have been assigned to handle report #4: \"Drainage Problem...\".",
+      "type": "assignment",
+      "link_url": "/reports/4",
+      "is_read": 0,
+      "created_at": "2026-09-02T17:03:36.000Z"
+    },
+    {
+      "id": 15,
+      "user_id": 2,
+      "title": "Status Update: REPORTED",
+      "message": "Your report \"Drainage Problem...\" moved to status: reported.",
+      "type": "status_change",
+      "link_url": "/reports/4",
+      "is_read": 0,
+      "created_at": "2026-09-02T17:03:36.000Z"
+    },
+    {
+      "id": 16,
+      "user_id": 7,
+      "title": "Report Submitted! 📋",
+      "message": "Your complaint \"Garbage...\" has been logged for municipal review.",
+      "type": "status_change",
+      "link_url": "/reports/7",
+      "is_read": 0,
+      "created_at": "2026-09-02T17:03:38.000Z"
+    },
+    {
+      "id": 17,
+      "user_id": 2,
+      "title": "Status Update: IN_PROGRESS",
+      "message": "Your report \"Drainage Problem...\" moved to status: in_progress.",
+      "type": "status_change",
+      "link_url": "/reports/4",
+      "is_read": 0,
+      "created_at": "2026-09-02T17:03:41.000Z"
+    },
+    {
+      "id": 18,
+      "user_id": 7,
+      "title": "Status Update: VERIFIED",
+      "message": "Your report \"Garbage...\" moved to status: verified.",
+      "type": "status_change",
+      "link_url": "/reports/7",
+      "is_read": 0,
+      "created_at": "2026-09-02T17:04:43.000Z"
+    },
+    {
+      "id": 19,
+      "user_id": 3,
+      "title": "New Cleanup Assignment 🧹",
+      "message": "You have been assigned to handle report #7: \"Garbage...\".",
+      "type": "assignment",
+      "link_url": "/reports/7",
+      "is_read": 0,
+      "created_at": "2026-09-02T17:05:01.000Z"
+    },
+    {
+      "id": 20,
+      "user_id": 7,
+      "title": "Status Update: VERIFIED",
+      "message": "Your report \"Garbage...\" moved to status: verified.",
+      "type": "status_change",
+      "link_url": "/reports/7",
+      "is_read": 0,
+      "created_at": "2026-09-02T17:05:01.000Z"
+    },
+    {
+      "id": 21,
+      "user_id": 7,
+      "title": "New Cleanup Assignment 🧹",
+      "message": "You have been assigned to handle report #5: \"Garbage...\".",
+      "type": "assignment",
+      "link_url": "/reports/5",
+      "is_read": 0,
+      "created_at": "2026-09-02T17:06:00.000Z"
+    },
+    {
+      "id": 22,
+      "user_id": 5,
+      "title": "Status Update: ASSIGNED",
+      "message": "Your report \"Garbage...\" moved to status: assigned.",
+      "type": "status_change",
+      "link_url": "/reports/5",
+      "is_read": 0,
+      "created_at": "2026-09-02T17:06:00.000Z"
+    },
+    {
+      "id": 23,
+      "user_id": 7,
+      "title": "New Cleanup Assignment 🧹",
+      "message": "You have been assigned to handle report #4: \"Drainage Problem...\".",
+      "type": "assignment",
+      "link_url": "/reports/4",
+      "is_read": 0,
+      "created_at": "2026-09-02T17:08:41.000Z"
+    },
+    {
+      "id": 24,
+      "user_id": 2,
+      "title": "Status Update: ASSIGNED",
+      "message": "Your report \"Drainage Problem...\" moved to status: assigned.",
+      "type": "status_change",
+      "link_url": "/reports/4",
+      "is_read": 0,
+      "created_at": "2026-09-02T17:08:41.000Z"
+    },
+    {
+      "id": 25,
+      "user_id": 2,
+      "title": "Status Update: VERIFIED",
+      "message": "Your report \"Filth...\" moved to status: verified.",
+      "type": "status_change",
+      "link_url": "/reports/3",
+      "is_read": 0,
+      "created_at": "2026-09-02T17:11:25.000Z"
+    },
+    {
+      "id": 26,
+      "user_id": 7,
+      "title": "Status Update: CLEANED",
+      "message": "Your report \"Garbage...\" moved to status: cleaned.",
+      "type": "status_change",
+      "link_url": "/reports/7",
+      "is_read": 0,
+      "created_at": "2026-09-02T17:12:56.000Z"
+    },
+    {
+      "id": 27,
+      "user_id": 7,
+      "title": "Status Update: CLEANED",
+      "message": "Your report \"Garbage...\" moved to status: cleaned.",
+      "type": "status_change",
+      "link_url": "/reports/7",
+      "is_read": 0,
+      "created_at": "2026-09-02T17:14:41.000Z"
+    }
+  ],
   "contact_messages": []
 }

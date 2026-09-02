@@ -5,29 +5,45 @@ import { useToast } from './ToastContext';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('wastewatch_user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
+  });
   const [token, setToken] = useState(() => localStorage.getItem('wastewatch_token'));
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!user);
   const { success, error: toastError } = useToast();
 
   const fetchCurrentUser = useCallback(async () => {
     const savedToken = localStorage.getItem('wastewatch_token');
     if (!savedToken) {
       setUser(null);
+      localStorage.removeItem('wastewatch_user');
       setLoading(false);
       return;
     }
 
     try {
       const res = await authService.getMe();
-      if (res.data.success) {
+      if (res.data && res.data.success && res.data.user) {
         setUser(res.data.user);
+        localStorage.setItem('wastewatch_user', JSON.stringify(res.data.user));
       }
     } catch (err) {
-      console.warn('Authentication check failed, clearing token.');
-      localStorage.removeItem('wastewatch_token');
-      setToken(null);
-      setUser(null);
+      // ONLY clear token if the server explicitly rejected authentication with 401 Unauthorized or 403 Forbidden.
+      // Temporary network errors, cold starts, or 500 errors will NOT log out the user.
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        console.warn('Authentication token expired or rejected, clearing session.');
+        localStorage.removeItem('wastewatch_token');
+        localStorage.removeItem('wastewatch_user');
+        setToken(null);
+        setUser(null);
+      } else {
+        console.warn('Background profile check notice (cold-start/network), keeping authenticated session active.');
+      }
     } finally {
       setLoading(false);
     }
@@ -43,6 +59,7 @@ export const AuthProvider = ({ children }) => {
       const res = await authService.login({ email, password });
       if (res.data.success) {
         localStorage.setItem('wastewatch_token', res.data.token);
+        localStorage.setItem('wastewatch_user', JSON.stringify(res.data.user));
         setToken(res.data.token);
         setUser(res.data.user);
         success(`Welcome back, ${res.data.user.name}!`);
@@ -60,11 +77,14 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await authService.register(userData);
       if (res.data.success) {
-        localStorage.setItem('wastewatch_token', res.data.token);
-        setToken(res.data.token);
-        setUser(res.data.user);
-        success('Account created successfully! Welcome to WasteWatch.');
-        return { success: true };
+        if (res.data.token && res.data.user) {
+          localStorage.setItem('wastewatch_token', res.data.token);
+          localStorage.setItem('wastewatch_user', JSON.stringify(res.data.user));
+          setToken(res.data.token);
+          setUser(res.data.user);
+        }
+        success(res.data.message || 'Account created successfully!');
+        return { success: true, pending_approval: res.data.pending_approval };
       }
     } catch (err) {
       const msg = err.response?.data?.message || 'Registration failed.';
@@ -79,6 +99,7 @@ export const AuthProvider = ({ children }) => {
       const res = await authService.demoLogin(role);
       if (res.data.success) {
         localStorage.setItem('wastewatch_token', res.data.token);
+        localStorage.setItem('wastewatch_user', JSON.stringify(res.data.user));
         setToken(res.data.token);
         setUser(res.data.user);
         success(`Logged in as demo ${role.toUpperCase()}!`);
@@ -94,6 +115,7 @@ export const AuthProvider = ({ children }) => {
   // Logout
   const logout = () => {
     localStorage.removeItem('wastewatch_token');
+    localStorage.removeItem('wastewatch_user');
     setToken(null);
     setUser(null);
     success('You have been logged out.');
@@ -101,7 +123,11 @@ export const AuthProvider = ({ children }) => {
 
   // Update user in state
   const updateUser = (updatedUser) => {
-    setUser((prev) => ({ ...prev, ...updatedUser }));
+    setUser((prev) => {
+      const updated = { ...prev, ...updatedUser };
+      localStorage.setItem('wastewatch_user', JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const isAdmin = user?.role === 'admin';

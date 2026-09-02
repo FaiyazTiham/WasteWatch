@@ -28,7 +28,7 @@ import AdminModerationPage from './pages/admin/AdminModerationPage';
 function ProtectedAdminRoute({ children }) {
   const { user, loading, isStaff } = useAuth();
 
-  if (loading) {
+  if (loading && !user) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />

@@ -225,31 +225,46 @@ exports.getMe = async (req, res) => {
     let stats = { totalReports: 0, cleanedReports: 0, totalUpvotesReceived: 0, totalUpvotesGiven: 0 };
 
     if (db.isMysqlActive) {
-      const [repRows] = await db.getPool().query(
-        'SELECT COUNT(*) as total, SUM(CASE WHEN status = "cleaned" THEN 1 ELSE 0 END) as cleaned FROM reports WHERE user_id = ?',
-        [userId]
-      );
-      const [upvoteGiven] = await db.getPool().query('SELECT COUNT(*) as total FROM upvotes WHERE user_id = ?', [userId]);
-      const [upvoteReceived] = await db.getPool().query(
-        'SELECT COUNT(u.id) as total FROM upvotes u JOIN reports r ON u.report_id = r.id WHERE r.user_id = ?',
-        [userId]
-      );
+      try {
+        const [repRows] = await db.getPool().query(
+          'SELECT COUNT(*) as total, SUM(CASE WHEN status = "cleaned" THEN 1 ELSE 0 END) as cleaned FROM reports WHERE user_id = ?',
+          [userId]
+        );
+        const [upvoteGiven] = await db.getPool().query('SELECT COUNT(*) as total FROM upvotes WHERE user_id = ?', [userId]);
+        const [upvoteReceived] = await db.getPool().query(
+          'SELECT COUNT(u.id) as total FROM upvotes u JOIN reports r ON u.report_id = r.id WHERE r.user_id = ?',
+          [userId]
+        );
 
-      stats.totalReports = repRows[0]?.total || 0;
-      stats.cleanedReports = repRows[0]?.cleaned || 0;
-      stats.totalUpvotesGiven = upvoteGiven[0]?.total || 0;
-      stats.totalUpvotesReceived = upvoteReceived[0]?.total || 0;
+        stats.totalReports = repRows[0]?.total || 0;
+        stats.cleanedReports = repRows[0]?.cleaned || 0;
+        stats.totalUpvotesGiven = upvoteGiven[0]?.total || 0;
+        stats.totalUpvotesReceived = upvoteReceived[0]?.total || 0;
+      } catch (sqlErr) {
+        console.warn('[getMe] MySQL stats error, using default stats:', sqlErr.message);
+      }
     } else {
-      const userReports = db.fallbackStore.data.reports.filter(r => Number(r.user_id) === Number(userId));
+      const allReports = db.fallbackStore.data.reports || [];
+      const allUpvotes = db.fallbackStore.data.upvotes || [];
+      const userReports = allReports.filter(r => Number(r.user_id) === Number(userId));
       stats.totalReports = userReports.length;
       stats.cleanedReports = userReports.filter(r => r.status === 'cleaned').length;
-      stats.totalUpvotesGiven = db.fallbackStore.data.upvotes.filter(u => Number(u.user_id) === Number(userId)).length;
+      stats.totalUpvotesGiven = allUpvotes.filter(u => Number(u.user_id) === Number(userId)).length;
       const userReportIds = new Set(userReports.map(r => Number(r.id)));
-      stats.totalUpvotesReceived = db.fallbackStore.data.upvotes.filter(u => userReportIds.has(Number(u.report_id))).length;
+      stats.totalUpvotesReceived = allUpvotes.filter(u => userReportIds.has(Number(u.report_id))).length;
     }
 
     return res.json({ success: true, user: req.user, stats });
   } catch (err) {
+    console.error('getMe error:', err);
+    // Return the authenticated req.user even if stats failed
+    if (req.user) {
+      return res.json({
+        success: true,
+        user: req.user,
+        stats: { totalReports: 0, cleanedReports: 0, totalUpvotesReceived: 0, totalUpvotesGiven: 0 }
+      });
+    }
     return res.status(500).json({ success: false, message: 'Failed to fetch user profile.', error: err.message });
   }
 };
