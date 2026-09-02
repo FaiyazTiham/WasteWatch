@@ -268,12 +268,12 @@ exports.approveUser = async (req, res) => {
       const [rows] = await db.getPool().query('SELECT * FROM users WHERE id = ?', [userId]);
       if (rows.length === 0) return res.status(404).json({ success: false, message: 'User not found' });
 
-      await db.getPool().query('UPDATE users SET status = "active" WHERE id = ?', [userId]);
+      await db.getPool().query('UPDATE users SET status = ? WHERE id = ?', ['active', userId]);
 
       // Notify user
       await db.getPool().query(
-        'INSERT INTO notifications (user_id, title, message, type, link_url, is_read) VALUES (?, ?, ?, "approval", "/profile", FALSE)',
-        [userId, 'Account Approved! 🎉', `Your requested ${rows[0].role} account has been approved by the administrator.`]
+        'INSERT INTO notifications (user_id, title, message, type, link_url, is_read) VALUES (?, ?, ?, ?, ?, FALSE)',
+        [userId, 'Account Approved! 🎉', `Your requested ${rows[0].role} account has been approved by the administrator.`, 'approval', '/profile']
       );
 
       return res.json({ success: true, message: `User ${rows[0].name} has been approved as ${rows[0].role}.` });
@@ -314,11 +314,11 @@ exports.rejectUser = async (req, res) => {
       if (rows.length === 0) return res.status(404).json({ success: false, message: 'User not found' });
 
       // Demote to standard citizen user or ban
-      await db.getPool().query('UPDATE users SET role = "user", status = "active" WHERE id = ?', [userId]);
+      await db.getPool().query('UPDATE users SET role = ?, status = ? WHERE id = ?', ['user', 'active', userId]);
 
       await db.getPool().query(
-        'INSERT INTO notifications (user_id, title, message, type, link_url, is_read) VALUES (?, ?, ?, "system", "/profile", FALSE)',
-        [userId, 'Access Request Update', 'Your request for staff/admin privileges was declined. Your account has been registered as a Citizen user.']
+        'INSERT INTO notifications (user_id, title, message, type, link_url, is_read) VALUES (?, ?, ?, ?, ?, FALSE)',
+        [userId, 'Access Request Update', 'Your request for staff/admin privileges was declined. Your account has been registered as a Citizen user.', 'system', '/profile']
       );
 
       return res.json({ success: true, message: `Staff/Admin request for ${rows[0].name} was rejected (account set to standard user).` });
@@ -509,7 +509,7 @@ exports.resolveFlag = async (req, res) => {
         await db.getPool().query('DELETE FROM reports WHERE id = ?', [flagRows[0].report_id]);
       }
 
-      await db.getPool().query('UPDATE flags SET status = "reviewed" WHERE id = ?', [flagId]);
+      await db.getPool().query('UPDATE flags SET status = ? WHERE id = ?', ['reviewed', flagId]);
       return res.json({ success: true, message: action === 'delete_report' ? 'Inappropriate report removed.' : 'Flag dismissed.' });
     }
 

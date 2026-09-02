@@ -16,7 +16,7 @@ function generateToken(user) {
 async function notifyAdmins({ title, message, type = 'approval_request', linkUrl = '/admin/users' }) {
   try {
     if (db.isMysqlActive) {
-      const [admins] = await db.getPool().query('SELECT id FROM users WHERE role = "admin" AND status = "active"');
+      const [admins] = await db.getPool().query('SELECT id FROM users WHERE role = ? AND status = ?', ['admin', 'active']);
       for (const admin of admins) {
         await db.getPool().query(
           'INSERT INTO notifications (user_id, title, message, type, link_url, is_read) VALUES (?, ?, ?, ?, ?, FALSE)',
@@ -228,8 +228,8 @@ exports.getMe = async (req, res) => {
     if (db.isMysqlActive) {
       try {
         const [repRows] = await db.getPool().query(
-          'SELECT COUNT(*) as total, SUM(CASE WHEN status = "cleaned" THEN 1 ELSE 0 END) as cleaned FROM reports WHERE user_id = ?',
-          [userId]
+          'SELECT COUNT(*) as total, SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as cleaned FROM reports WHERE user_id = ?',
+          ['cleaned', userId]
         );
         const [upvoteGiven] = await db.getPool().query('SELECT COUNT(*) as total FROM upvotes WHERE user_id = ?', [userId]);
         const [upvoteReceived] = await db.getPool().query(

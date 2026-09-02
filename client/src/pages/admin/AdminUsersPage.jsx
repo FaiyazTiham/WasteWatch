@@ -68,7 +68,7 @@ export default function AdminUsersPage() {
         );
       }
     } catch (err) {
-      error('Failed to approve user.');
+      error(err.response?.data?.error || err.response?.data?.message || 'Failed to approve user.');
     }
   };
 
@@ -82,7 +82,7 @@ export default function AdminUsersPage() {
         );
       }
     } catch (err) {
-      error('Failed to reject user request.');
+      error(err.response?.data?.error || err.response?.data?.message || 'Failed to reject user request.');
     }
   };
 

@@ -820,10 +820,10 @@ exports.flagReport = async (req, res) => {
 
     if (db.isMysqlActive) {
       await db.getPool().query(
-        'INSERT INTO flags (report_id, user_id, reason, details, status) VALUES (?, ?, ?, ?, "pending")',
-        [reportId, userId, reason, details || null]
+        'INSERT INTO flags (report_id, user_id, reason, details, status) VALUES (?, ?, ?, ?, ?)',
+        [reportId, userId, reason, details || null, 'pending']
       );
-      const [admins] = await db.getPool().query('SELECT id FROM users WHERE role = "admin" AND status = "active"');
+      const [admins] = await db.getPool().query('SELECT id FROM users WHERE role = ? AND status = ?', ['admin', 'active']);
       for (const admin of admins) {
         await createNotification({
           userId: admin.id,
