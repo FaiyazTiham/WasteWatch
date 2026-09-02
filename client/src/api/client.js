@@ -1,7 +1,21 @@
 import axios from 'axios';
 
-const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
-const API_BASE = import.meta.env.VITE_API_URL || `http://${hostname}:5000/api`;
+function getApiBaseUrl() {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  if (typeof window !== 'undefined') {
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (isLocal) {
+      return `http://${window.location.hostname}:5000/api`;
+    }
+    // Production (Vercel, custom domain): use relative /api
+    return '/api';
+  }
+  return '/api';
+}
+
+const API_BASE = getApiBaseUrl();
 
 const api = axios.create({
   baseURL: API_BASE,
@@ -39,8 +53,18 @@ api.interceptors.response.use(
 export function getImageUrl(url) {
   if (!url) return 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80';
   if (url.startsWith('/uploads')) {
-    const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
-    return `http://${hostname}:5000${url}`;
+    if (import.meta.env.VITE_API_URL) {
+      const base = import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '');
+      return `${base}${url}`;
+    }
+    if (typeof window !== 'undefined') {
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      if (isLocal) {
+        return `http://${window.location.hostname}:5000${url}`;
+      }
+      return url;
+    }
+    return url;
   }
   return url;
 }

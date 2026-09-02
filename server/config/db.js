@@ -2,6 +2,7 @@ const mysql = require('mysql2/promise');
 const path = require('path');
 const fs = require('fs');
 const net = require('net');
+const os = require('os');
 const envPath = fs.existsSync(path.resolve(__dirname, '../../.env'))
   ? path.resolve(__dirname, '../../.env')
   : path.resolve(__dirname, '../.env');
@@ -11,7 +12,10 @@ let dbPool = null;
 let isMysqlActive = false;
 
 // Persistent In-Memory / File Storage
-const DATA_FILE = path.join(__dirname, '..', 'data_store.json');
+const BUNDLED_DATA_FILE = path.join(__dirname, '..', 'data_store.json');
+const DATA_FILE = process.env.VERCEL
+  ? path.join(os.tmpdir(), 'wastewatch_data_store.json')
+  : BUNDLED_DATA_FILE;
 
 class FallbackDB {
   constructor() {
@@ -35,6 +39,16 @@ class FallbackDB {
       if (fs.existsSync(DATA_FILE)) {
         const raw = fs.readFileSync(DATA_FILE, 'utf-8');
         this.data = JSON.parse(raw);
+      } else if (fs.existsSync(BUNDLED_DATA_FILE)) {
+        const raw = fs.readFileSync(BUNDLED_DATA_FILE, 'utf-8');
+        this.data = JSON.parse(raw);
+        if (process.env.VERCEL) {
+          try {
+            fs.writeFileSync(DATA_FILE, raw, 'utf-8');
+          } catch (wErr) {
+            console.warn('Fallback store initial /tmp copy warning:', wErr.message);
+          }
+        }
       }
     } catch (err) {
       console.warn('Fallback store load error, using memory:', err.message);
